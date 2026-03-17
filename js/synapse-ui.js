@@ -31,8 +31,8 @@ function initSynapse() {
 
   // How many ticks each phase lasts before auto-advancing (at 1× speed)
   const PHASE_DURATIONS = {
-    ap: 62, vgcc: 70, ca_in: 76, fusion: 85,
-    release: 80, ampa_open: 95, nmda_open: 105,
+    ap: 85, vgcc: 95, ca_in: 100, fusion: 110,
+    release: 105, ampa_open: 120, nmda_open: 130,
     camkii: 99999, // stays until manually advanced
   };
 
@@ -79,6 +79,49 @@ function initSynapse() {
     goToPhase(PHASES[idx + 1]);
   }
 
+  function goBackPhase() {
+    const idx = PHASES.indexOf(phase);
+    if (idx < 1) return; // can't go back from rest
+    const prevPhase = PHASES[idx - 1];
+    // Reset vesicles when going back
+    for (const v of VESICLES) {
+      v.fusing = false;
+      v.released = false;
+      v.fuseProgress = 0;
+      v.cx = v.origCx;
+      v.cy = v.origCy;
+    }
+    particles.length = 0;
+    // For fusion phase, need vesicles to be "fusing" so release can run
+    if (prevPhase === 'fusion') {
+      for (const v of VESICLES) {
+        if (v.docked) v.fusing = true;
+      }
+    }
+    if (prevPhase === 'rest') {
+      phase = 'rest';
+      phaseTimer = 99999;
+      waiting = false;
+      particles.length = 0;
+      arrows.length = 0;
+      for (const v of VESICLES) {
+        v.fusing = false;
+        v.released = false;
+        v.fuseProgress = 0;
+        v.cx = v.origCx;
+        v.cy = v.origCy;
+      }
+      document.querySelectorAll('.step-row').forEach(el => el.classList.remove('active', 'done'));
+      document.getElementById('step-popup').classList.remove('show');
+      document.getElementById('btn-fire').disabled = false;
+      document.getElementById('btn-back').disabled = true;
+      document.getElementById('btn-next').disabled = true;
+      document.getElementById('btn-replay').style.display = 'none';
+    } else {
+      goToPhase(prevPhase);
+    }
+  }
+
   function goToPhase(ph) {
     phase = ph;
     // Spawn particles / arrows appropriate to this phase
@@ -87,6 +130,8 @@ function initSynapse() {
     setStepUI(PHASES.indexOf(ph) - 1);
 
     const isAuto = document.getElementById('cb-auto').checked;
+    const idx = PHASES.indexOf(ph);
+    document.getElementById('btn-back').disabled = (idx < 1);
     if (isAuto) {
       phaseTimer = stepDur(ph);
       waiting    = false;
@@ -94,7 +139,7 @@ function initSynapse() {
       phaseTimer = 99999;
       waiting    = true;
       document.getElementById('btn-replay').style.display = 'block';
-      document.getElementById('btn-next').disabled = (PHASES.indexOf(ph) >= PHASES.length - 1);
+      document.getElementById('btn-next').disabled = (idx >= PHASES.length - 1);
     }
   }
 
@@ -134,6 +179,11 @@ function initSynapse() {
     goToPhase('ap');
   });
 
+  // Back; go to previous phase
+  document.getElementById('btn-back').addEventListener('click', () => {
+    goBackPhase();
+  });
+
   // Next →; advance one phase while in manual mode
   document.getElementById('btn-next').addEventListener('click', () => {
     if (waiting) advancePhase();
@@ -165,6 +215,7 @@ function initSynapse() {
     document.querySelectorAll('.step-row').forEach(el => el.classList.remove('active', 'done'));
     document.getElementById('step-popup').classList.remove('show');
     document.getElementById('btn-fire').disabled   = false;
+    document.getElementById('btn-back').disabled   = true;
     document.getElementById('btn-next').disabled   = true;
     document.getElementById('btn-replay').style.display = 'none';
     showInfo(null, null);

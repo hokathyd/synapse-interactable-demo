@@ -369,7 +369,7 @@ function drawPSD95(ctx) {
  * The pore gap widens when active (glutamate bound).
  */
 function drawAMPA(ctx, phase) {
-  const ampaActive = ['release','ampa_open','nmda_open','camkii'].includes(phase);
+  const ampaActive = ['ampa_open','nmda_open','camkii'].includes(phase);
 
   for (let ci = 0; ci < 2; ci++) {
     const cx = COLS[ci].cx;

@@ -147,44 +147,44 @@ const STEP_POPUPS = [
   {
     tag:   'Step 1; AP',
     title: 'Action Potential Arrives',
-    body:  'The electrical signal travels down the axon and reaches the terminal. This change in ' +
-           'membrane voltage is the trigger for everything that follows.',
+    body:  'The electrical signal travels down the axon and reaches the terminal. This voltage ' +
+           'change is the trigger for everything that follows.',
   },
   {
     tag:   'Step 2; VGCCs',
     title: 'Ca²⁺ Channels Open',
-    body:  'The voltage change opens Ca²⁺ channels. They stay open for only ~1 ms, but Ca²⁺ flows ' +
-           'in quickly because there is much more outside than inside the cell',
+    body:  'The voltage change opens voltage-gated Ca²⁺ channels (VGCCs) in the terminal membrane. ' +
+           'Ca²⁺ flows in quickly because there is much more outside than inside the cell.',
   },
   {
     tag:   'Step 3; Ca²⁺',
     title: 'Ca²⁺ Triggers Vesicle Fusion',
-    body:  'Ca²⁺ binds to proteins on the docked vesicles. This causes the vesicle and cell ' +
-           'membrane to merge together',
+    body:  'Ca²⁺ binds to proteins on the docked vesicles. This triggers the vesicle to fuse ' +
+           'with the cell membrane and release its contents.',
   },
   {
     tag:   'Step 4; Fusion',
     title: 'Vesicle Fuses; Glutamate Released',
-    body:  'The vesicle fuses with the membrane and releases ~3,000 glutamate molecules into ' +
-           'the cleft. This happens in under 1 ms',
+    body:  'The vesicle merges with the membrane and releases ~3,000 glutamate molecules into ' +
+           'the synaptic cleft. This happens in under 1 ms.',
   },
   {
     tag:   'Step 5; Diffusion',
     title: 'Glutamate Crosses the Cleft',
-    body:  'The cleft is very narrow (10-20 nm), so glutamate reaches the receptors in under ' +
-           'half a millisecond. Other cells then clear it away',
+    body:  'The cleft is very narrow (10–20 nm). Glutamate diffuses across it in under half a ' +
+           'millisecond and binds to receptors on the postsynaptic side.',
   },
   {
     tag:   'Step 6; AMPA',
     title: 'AMPA Receptors Open',
     body:  'Glutamate binds to AMPA receptors and opens them. Na⁺ flows in, depolarizing the ' +
-           'cell within 1-2 ms. This is the fast excitatory signal.',
+           'cell within 1–2 ms. This is the fast excitatory signal (EPSP).',
   },
   {
     tag:   'Step 7; NMDA',
     title: 'NMDA Unblocks; Ca²⁺ Enters',
     body:  'NMDA receptors are blocked by Mg²⁺ at rest. The depolarization from AMPA pushes ' +
-           'Mg²⁺ out, so Ca²⁺ (and Na⁺) can now flow in. This Ca²⁺ signal drives plasticity',
+           'Mg²⁺ out, so Ca²⁺ (and Na⁺) can now flow in. This Ca²⁺ signal drives plasticity.',
   },
   {
     tag:   'Step 8; LTP',
