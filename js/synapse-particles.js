@@ -53,7 +53,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
 
   switch (phase) {
 
-    // ── Step 1: Action potential travels down each axon column ──
+    // ── Step 1: Action potential arrives; travels down each axon column ──
     case 'ap':
       for (const col of COLS) {
         spawnDir(particles, 'ap', col.cx, 0, col.cx, AXON_BOT, 8);
@@ -81,7 +81,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 4: Vesicle disappears (merges); glutamate flows out from 3 fusion sites per terminal ──
+    // ── Step 3: Vesicle disappears (merges); glutamate flows out from 3 fusion sites per terminal ──
     case 'fusion':
       for (const v of VESICLES) {
         if (v.stuckAtMembrane) v.released = true;  // vesicle disappears now
@@ -99,7 +99,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 5: Glutamate continues from cleft into AMPA receptors, binds (flow only, no arrows) ──
+    // ── Step 4: Glutamate continues from cleft into AMPA receptors, binds (flow only, no arrows) ──
     case 'release':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
@@ -111,7 +111,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 6: Glutamate disappears from AMPA; AMPA opens; Na⁺ flows in ──
+    // ── Step 5: Glutamate disappears from AMPA; AMPA opens; Na⁺ flows in ──
     case 'ampa_open':
       for (let i = particles.length - 1; i >= 0; i--) {
         if (particles[i].type === 'glu') particles.splice(i, 1);
@@ -125,7 +125,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 7: NMDA opens; Ca²⁺ flows in ──
+    // ── Step 6: NMDA opens; Ca²⁺ flows in ──
     case 'nmda_open':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
@@ -136,7 +136,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 8: Ca²⁺ activates CaMKII → LTP (flow only, no arrows; 2 directions toward CaMKII) ──
+    // ── Step 7: Ca²⁺ activates CaMKII → LTP (flow only, no arrows; 2 directions toward CaMKII) ──
     case 'camkii':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;

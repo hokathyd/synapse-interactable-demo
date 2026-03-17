@@ -165,6 +165,13 @@ function initSynapse() {
 
 
   // ── Step list UI ─────────────────────────────────
+  // Sync step row labels from STEP_POPUPS
+  document.querySelectorAll('.step-row').forEach((el, i) => {
+    if (STEP_POPUPS[i]) {
+      el.querySelector('.snum').textContent = i;
+      el.querySelector('.stxt').textContent = STEP_POPUPS[i].label || STEP_POPUPS[i].title;
+    }
+  });
 
   function setStepUI(idx) {
     document.querySelectorAll('.step-row').forEach((el, i) => {
