@@ -14,7 +14,7 @@
 let synapseStarted = false;
 
 /**
- * Entry point — called by navigation.js when the user clicks "Zoom into synapse".
+ * Entry point; called by navigation.js when the user clicks "Zoom into synapse".
  */
 function startSynapse() {
   if (synapseStarted) return;
@@ -127,25 +127,25 @@ function initSynapse() {
 
   // ── Button handlers ──────────────────────────────
 
-  // Fire AP — starts the sequence from rest
+  // Fire AP; starts the sequence from rest
   document.getElementById('btn-fire').addEventListener('click', () => {
     if (phase !== 'rest') return;
     document.getElementById('btn-fire').disabled = true;
     goToPhase('ap');
   });
 
-  // Next → — advance one phase while in manual mode
+  // Next →; advance one phase while in manual mode
   document.getElementById('btn-next').addEventListener('click', () => {
     if (waiting) advancePhase();
   });
 
-  // Replay — re-spawn the current phase's particles/arrows
+  // Replay; re-spawn the current phase's particles/arrows
   document.getElementById('btn-replay').addEventListener('click', () => {
     arrows.length = 0;
     phaseParticles(phase, particles, arrows, VESICLES);
   });
 
-  // Reset all — return to rest state
+  // Reset all; return to rest state
   document.getElementById('btn-reset').addEventListener('click', () => {
     phase      = 'rest';
     phaseTimer = 99999;
@@ -170,7 +170,7 @@ function initSynapse() {
     showInfo(null, null);
   });
 
-  // Autoplay toggle — if switched on while waiting, resume
+  // Autoplay toggle; if switched on while waiting, resume
   document.getElementById('cb-auto').addEventListener('change', e => {
     if (e.target.checked && waiting && phase !== 'rest' && phase !== 'camkii') {
       waiting    = false;

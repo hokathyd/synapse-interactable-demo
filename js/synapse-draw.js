@@ -106,7 +106,7 @@ function drawPresynaptic(ctx, phase, VESICLES) {
     reg('terminal', cx, PRE_TOP / 2, TERM_R, PRE_TOP / 2 + TERM_R * .5, ci);
   }
 
-  // "PRESYNAPTIC" region label — left side, below terminal labels
+  // "PRESYNAPTIC" region label; left side, below terminal labels
   ctx.font = '700 11px Nunito,sans-serif';
   ctx.fillStyle = 'rgba(30,70,160,.55)';
   ctx.textAlign = 'left';
@@ -277,7 +277,7 @@ function drawStaticIons(ctx, particles, W) {
  * has been drawn within MIN_LABEL_DIST pixels (avoids crowded labels).
  */
 function drawIonGroup(ctx, ions) {
-  const MIN_LABEL_DIST = 55; // px — minimum distance between same-type labels
+  const MIN_LABEL_DIST = 55; // px; minimum distance between same-type labels
   const labelled = {}; // label → [{x,y}]
 
   for (const ion of ions) {
@@ -312,7 +312,7 @@ function drawPostsynaptic(ctx, phase) {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
 
-  // ── Dendrite shaft — fills from POST_BOT to bottom of canvas ──
+  // ── Dendrite shaft; fills from POST_BOT to bottom of canvas ──
   {
     const isHS = hov === 'dendrite', isSS = sel === 'dendrite';
     ctx.fillStyle   = isHS || isSS ? POST_FILL_H : POST_FILL;
@@ -327,7 +327,7 @@ function drawPostsynaptic(ctx, phase) {
   ctx.fillStyle = 'rgba(220,212,252,.38)';
   ctx.fillRect(0, POST_T, W, POST_BOT - POST_T);
 
-  // "POSTSYNAPTIC" label — bottom left
+  // "POSTSYNAPTIC" label; bottom left
   ctx.font = '700 11px Nunito,sans-serif';
   ctx.fillStyle = 'rgba(80,50,165,.52)';
   ctx.textAlign = 'left';
@@ -450,7 +450,7 @@ function drawNMDA(ctx, phase) {
     }
 
     if (!nmdaActive) {
-      // Mg²⁺ block — large grey rectangle in the pore
+      // Mg²⁺ block; large grey rectangle in the pore
       ctx.fillStyle = 'rgba(160,160,175,.95)';
       ctx.beginPath(); ctx.roundRect(nx - 11, ny + 14, 22, 26, 5); ctx.fill();
       ctx.strokeStyle = 'rgba(120,120,140,.8)'; ctx.lineWidth = 1.5; ctx.stroke();
@@ -459,7 +459,7 @@ function drawNMDA(ctx, phase) {
       ctx.font = '600 8px Nunito,sans-serif'; ctx.fillStyle = 'rgba(180,30,30,.75)';
       ctx.textAlign = 'center'; ctx.fillText('BLOCKED', nx, ny + 10);
     } else {
-      // Open pore — Ca²⁺ colour hint
+      // Open pore; Ca²⁺ colour hint
       ctx.fillStyle = 'rgba(224,112,80,.32)';
       ctx.fillRect(nx - gap2 / 2 + 1, ny + 3, gap2, 54);
       ctx.font = '600 8px Nunito,sans-serif'; ctx.fillStyle = 'rgba(180,80,20,.80)';
@@ -516,8 +516,8 @@ function drawCaMKII(ctx, phase) {
  * and only if no same-type label was drawn within MIN_DIST pixels this frame.
  */
 function drawParticles(ctx, particles) {
-  const MIN_DIST  = 40; // px — minimum gap between particle labels of the same type
-  const labelled  = {}; // type → [{x,y}] — positions already labelled this frame
+  const MIN_DIST  = 40; // px; minimum gap between particle labels of the same type
+  const labelled  = {}; // type → [{x,y}]; positions already labelled this frame
 
   const ION_LABELS = { ca: 'Ca²⁺', glu: 'Glu', na: 'Na⁺', ca2: 'Ca²⁺' };
 
@@ -538,7 +538,7 @@ function drawParticles(ctx, particles) {
     ctx.fillStyle = fc; ctx.shadowBlur = 9; ctx.shadowColor = sc;
     ctx.fill(); ctx.shadowBlur = 0;
 
-    // Ion label — sparse: skip odd indices, dim particles, and nearby same-type labels
+    // Ion label; sparse: skip odd indices, dim particles, and nearby same-type labels
     const lbl = ION_LABELS[p.type];
     if (lbl && i % 2 === 0 && al > 0.45) {
       const prev = labelled[p.type] || [];
@@ -590,7 +590,7 @@ function drawSynapseTooltip(ctx) {
 
 
 /**
- * Master draw function — called every animation frame by synapse-ui.js.
+ * Master draw function; called every animation frame by synapse-ui.js.
  * @param {CanvasRenderingContext2D} ctx
  * @param {string}  phase     Current phase name
  * @param {Array}   particles Live particle array (mutated in place)

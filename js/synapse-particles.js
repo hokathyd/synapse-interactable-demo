@@ -60,7 +60,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 2: VGCCs open — Ca²⁺ enters from outside ──
+    // ── Step 2: VGCCs open; Ca²⁺ enters from outside ──
     case 'vgcc':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
@@ -91,7 +91,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 4: Vesicle fusion — glutamate into cleft ──
+    // ── Step 4: Vesicle fusion; glutamate into cleft ──
     case 'fusion':
       for (const v of VESICLES) {
         if (!v.fusing) continue;
@@ -119,7 +119,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 6: AMPA opens — Na⁺ flows in ──
+    // ── Step 6: AMPA opens; Na⁺ flows in ──
     case 'ampa_open':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
@@ -130,7 +130,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 7: NMDA opens — Ca²⁺ flows in ──
+    // ── Step 7: NMDA opens; Ca²⁺ flows in ──
     case 'nmda_open':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
@@ -155,7 +155,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // 'rest' — nothing to spawn
+    // 'rest'; nothing to spawn
     default:
       break;
   }

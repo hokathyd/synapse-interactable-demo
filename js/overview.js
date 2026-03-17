@@ -308,7 +308,7 @@
   // ── Labels ────────────────────────────────────────
 
   function drawOverviewLabels() {
-    // Neuron names — larger, prominent
+    // Neuron names; larger, prominent
     c.font = '700 13px Nunito,sans-serif';
     c.fillStyle = 'rgba(172,142,228,.92)';
     c.textAlign = 'left';  c.fillText('Presynaptic neuron', 6, 18);
