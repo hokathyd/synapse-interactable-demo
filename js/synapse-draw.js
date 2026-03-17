@@ -147,8 +147,8 @@ function drawVGCCs(ctx, phase) {
       ctx.moveTo(-vr, 0);
       ctx.arc(0, 0, vr, Math.PI, 0, false);
       ctx.closePath();
-      ctx.fillStyle   = vgccOpen ? ION_RGBA.ca(.72) : 'rgba(255,140,0,.28)';
-      ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.vgcc : (vgccOpen ? RECEPTOR_COLORS.vgcc : 'rgba(255,140,0,.5)');
+      ctx.fillStyle   = vgccOpen ? ION_RGBA.ca(.72) : 'rgba(255,140,0,.42)';
+      ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.vgcc : (vgccOpen ? RECEPTOR_COLORS.vgcc : 'rgba(255,140,0,.6)');
       ctx.lineWidth   = isH || isS ? 2.8 : 1.8;
       ctx.fill(); ctx.stroke();
 
@@ -191,7 +191,7 @@ function drawVesicles(ctx, VESICLES) {
 
     // Vesicle circle (glutamate-colored)
     ctx.beginPath(); ctx.arc(v.cx, v.cy, v.r, 0, Math.PI * 2);
-    ctx.fillStyle   = isH || isS ? ION_RGBA.glu(.48) : ION_RGBA.glu(.28);
+    ctx.fillStyle   = isH || isS ? ION_RGBA.glu(.52) : ION_RGBA.glu(.38);
     ctx.strokeStyle = isH || isS ? '#cc3300' : ION_COLORS.glu;
     ctx.lineWidth   = isH || isS ? 2.8 : 2.2;
     ctx.fill(); ctx.stroke();
@@ -356,9 +356,9 @@ function drawPSD95(ctx) {
     const isS = sel === 'psd95' && selId === ci;
     ctx.beginPath();
     ctx.rect(cx - BOX_SPINE_W / 2 + 8, psdY, BOX_SPINE_W - 16, psdH);
-    ctx.fillStyle   = isH || isS ? 'rgba(148,163,184,.5)' : 'rgba(148,163,184,.25)';
-    ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.psd95 : 'rgba(148,163,184,.45)';
-    ctx.lineWidth   = isH || isS ? 1.5 : 1;
+    ctx.fillStyle   = isH || isS ? 'rgba(148,163,184,.6)' : 'rgba(148,163,184,.45)';
+    ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.psd95 : 'rgba(148,163,184,.65)';
+    ctx.lineWidth   = isH || isS ? 2 : 1.4;
     ctx.fill(); ctx.stroke();
     reg('psd95', cx, psdY + psdH / 2, BOX_SPINE_W / 2 - 8, psdH / 2, ci);
   }
@@ -384,7 +384,7 @@ function drawAMPA(ctx, phase) {
       // Two subunit ellipses (AMPA; mint green)
       for (const dx of [-gap / 2 - 14, gap / 2 + 2]) {
         ctx.beginPath(); ctx.ellipse(ax + dx + 6, ay + 28, 13, 30, 0, 0, Math.PI * 2);
-        ctx.fillStyle   = ampaActive ? 'rgba(105,240,174,.55)' : 'rgba(105,240,174,.28)';
+        ctx.fillStyle   = ampaActive ? 'rgba(105,240,174,.58)' : 'rgba(105,240,174,.4)';
         ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.ampa : (ampaActive ? RECEPTOR_COLORS.ampa : 'rgba(105,240,174,.6)');
         ctx.lineWidth   = isH || isS ? 2.8 : 1.8;
         ctx.fill(); ctx.stroke();
@@ -421,7 +421,7 @@ function drawNMDA(ctx, phase) {
     // Two subunit ellipses (NMDA; teal)
     for (const dx of [-gap2 / 2 - 14, gap2 / 2 + 2]) {
       ctx.beginPath(); ctx.ellipse(nx + dx + 6, ny + 30, 14, 34, 0, 0, Math.PI * 2);
-      ctx.fillStyle   = nmdaActive ? 'rgba(38,166,154,.6)' : 'rgba(38,166,154,.25)';
+      ctx.fillStyle   = nmdaActive ? 'rgba(38,166,154,.62)' : 'rgba(38,166,154,.38)';
       ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.nmda : (nmdaActive ? RECEPTOR_COLORS.nmda : 'rgba(38,166,154,.55)');
       ctx.lineWidth   = isH || isS ? 2.8 : 1.8;
       ctx.fill(); ctx.stroke();
@@ -471,14 +471,14 @@ function drawCaMKII(ctx, phase) {
                 : ctx.lineTo(kx + Math.cos(a) * 13, ky + Math.sin(a) * 13);
       }
       ctx.closePath();
-      ctx.fillStyle   = ckOn ? `rgba(224,122,95,${.3 + pulse * .35})` : 'rgba(148,163,184,.12)';
-      ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.camkii : (ckOn ? `rgba(224,122,95,${.75 + pulse * .2})` : 'rgba(148,163,184,.35)');
+      ctx.fillStyle   = ckOn ? `rgba(224,122,95,${.35 + pulse * .35})` : 'rgba(224,122,95,.18)';
+      ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.camkii : (ckOn ? `rgba(224,122,95,${.8 + pulse * .2})` : 'rgba(224,122,95,.45)');
       ctx.lineWidth   = isH || isS ? 2.2 : 1.4;
       ctx.fill(); ctx.stroke();
 
       // Centre dot
       ctx.beginPath(); ctx.arc(kx, ky, 3, 0, Math.PI * 2);
-      ctx.fillStyle = ckOn ? 'rgba(224,122,95,.9)' : 'rgba(148,163,184,.35)';
+      ctx.fillStyle = ckOn ? 'rgba(224,122,95,.9)' : 'rgba(224,122,95,.5)';
       ctx.fill();
 
       reg('camkii', kx, ky, 16, 16, ci * 10 + ki);

@@ -62,20 +62,28 @@
 
     <div class="synapse-layout">
 
-      <!-- Left: canvas + legend + step popup -->
-      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
-        <canvas id="syn-canvas" width="840" height="680"></canvas>
+      <!-- Left: legend card -->
+      <div class="pcard legend-left">
+        <div class="leg-hdr">Legend</div>
+        <div class="leg-section">Ions</div>
+        <div class="leg-row"><div class="ldot" style="background:#FFEB3B"></div>Action potential</div>
+        <div class="leg-row"><div class="ldot" style="background:#FF8C00"></div>Ca²⁺ (calcium)</div>
+        <div class="leg-row"><div class="ldot" style="background:#9E9E9E"></div>Na⁺ (sodium)</div>
+        <div class="leg-row"><div class="ldot" style="background:#FF69B4"></div>K⁺ (potassium)</div>
+        <div class="leg-row"><div class="ldot" style="background:#4B0082"></div>Mg²⁺ (magnesium)</div>
+        <div class="leg-row"><div class="ldot" style="background:#FF0000"></div>Glutamate</div>
+        <div class="leg-section">Structures</div>
+        <div class="leg-row"><div class="ldot" style="background:#FF8C00"></div>VGCC (Ca²⁺ channel)</div>
+        <div class="leg-row"><div class="ldot" style="background:#FF0000"></div>Synaptic vesicle</div>
+        <div class="leg-row"><div class="ldot" style="background:#69f0ae"></div>AMPA receptor</div>
+        <div class="leg-row"><div class="ldot" style="background:#26a69a"></div>NMDA receptor</div>
+        <div class="leg-row"><div class="ldot" style="background:#94a3b8"></div>PSD-95 scaffold</div>
+        <div class="leg-row"><div class="ldot" style="background:#e07a5f"></div>CaMKII</div>
+      </div>
 
-        <!-- Legend (below canvas) -->
-        <div class="pcard legend-below">
-          <div class="leg-hdr">Legend</div>
-          <div class="leg-row"><div class="ldot" style="background:#FFEB3B"></div>Action potential</div>
-          <div class="leg-row"><div class="ldot" style="background:#FF8C00"></div>Ca²⁺ (calcium)</div>
-          <div class="leg-row"><div class="ldot" style="background:#9E9E9E"></div>Na⁺ (sodium)</div>
-          <div class="leg-row"><div class="ldot" style="background:#FF69B4"></div>K⁺ (potassium)</div>
-          <div class="leg-row"><div class="ldot" style="background:#4B0082"></div>Mg²⁺ (magnesium)</div>
-          <div class="leg-row"><div class="ldot" style="background:#FF0000"></div>Glutamate</div>
-        </div>
+      <!-- Center: canvas + step popup -->
+      <div class="canvas-step-wrap">
+        <canvas id="syn-canvas" width="840" height="680"></canvas>
 
         <!-- Step detail popup (shown below canvas when a phase is active) -->
         <div id="step-popup">
@@ -84,9 +92,9 @@
           <h4 id="pop-title"></h4>
           <p id="pop-body"></p>
         </div>
-      </div>
+      </div><!-- /.canvas-step-wrap -->
 
-      <!-- Right panel: info + controls + legend -->
+      <!-- Right panel: info + controls -->
       <div class="panel">
 
         <!-- Hover/click info card -->
