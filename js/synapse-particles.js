@@ -61,19 +61,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 2: SNARE lines appear, then yank vesicles down to membrane ──
-    case 'snare':
-      for (const v of VESICLES) {
-        if (v.docked && !v.stuckAtMembrane && !v.released) {
-          v.fusing = true;
-          v.fuseProgress = 0;
-          v.cx = v.origCx;
-          v.cy = v.origCy;
-        }
-      }
-      break;
-
-    // ── Step 3: VGCCs open; Ca²⁺ enters (only Ca²⁺ movement) ──
+    // ── Step 2: VGCCs open; Ca²⁺ enters ──
     case 'vgcc':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;

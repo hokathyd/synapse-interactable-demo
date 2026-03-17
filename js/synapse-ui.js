@@ -27,11 +27,12 @@ function initSynapse() {
   const ctx    = canvas.getContext('2d');
 
   // ── Phase order ──────────────────────────────────
-  const PHASES = ['rest','ap','snare','vgcc','fusion','release','ampa_open','nmda_open','camkii'];
+  // Vesicles start docked & primed at rest; Fire AP → ap → vgcc → fusion → ...
+  const PHASES = ['rest','ap','vgcc','fusion','release','ampa_open','nmda_open','camkii'];
 
   // How many ticks each phase lasts before auto-advancing (at 1× speed)
   const PHASE_DURATIONS = {
-    ap: 85, snare: 90, vgcc: 95, fusion: 110,
+    ap: 85, vgcc: 95, fusion: 110,
     release: 105, ampa_open: 120, nmda_open: 130,
     camkii: 99999, // stays until manually advanced
   };
@@ -87,45 +88,44 @@ function initSynapse() {
     for (const v of VESICLES) {
       v.fusing = false;
       v.released = false;
-      v.stuckAtMembrane = false;
       v.fuseProgress = 0;
-      v.cx = v.origCx;
-      v.cy = v.origCy;
+      if (v.docked) {
+        v.stuckAtMembrane = true;
+        const cx = COLS[v.col].cx;
+        const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
+        const t = FUSE_TARGETS[fuseIdx];
+        v.cx = cx + t.dx;
+        v.cy = PRE_BOT + t.dy;
+      } else {
+        v.stuckAtMembrane = false;
+        v.cx = v.origCx;
+        v.cy = v.origCy;
+      }
     }
     particles.length = 0;
-    if (prevPhase === 'fusion') {
-      for (const v of VESICLES) {
-        if (v.docked) v.stuckAtMembrane = true;
-      }
-    } else if (prevPhase === 'vgcc') {
-      for (const v of VESICLES) {
-        if (v.docked) {
-          v.stuckAtMembrane = true;
-          v.fusing = false;
-          const cx = COLS[v.col].cx;
-          const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
-          const t = FUSE_TARGETS[fuseIdx];
-          v.cx = cx + t.dx;
-          v.cy = PRE_BOT + t.dy;
-        } else {
-          v.cx = v.origCx;
-          v.cy = v.origCy;
-        }
-      }
-    }
     if (prevPhase === 'rest') {
       phase = 'rest';
       phaseTimer = 99999;
       waiting = false;
       particles.length = 0;
       arrows.length = 0;
+      setStepUI(0);  // Step 1: vesicles docked & primed
       for (const v of VESICLES) {
         v.fusing = false;
         v.released = false;
-        v.stuckAtMembrane = false;
         v.fuseProgress = 0;
-        v.cx = v.origCx;
-        v.cy = v.origCy;
+        if (v.docked) {
+          v.stuckAtMembrane = true;
+          const cx = COLS[v.col].cx;
+          const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
+          const t = FUSE_TARGETS[fuseIdx];
+          v.cx = cx + t.dx;
+          v.cy = PRE_BOT + t.dy;
+        } else {
+          v.stuckAtMembrane = false;
+          v.cx = v.origCx;
+          v.cy = v.origCy;
+        }
       }
       document.querySelectorAll('.step-row').forEach(el => el.classList.remove('active', 'done'));
       document.getElementById('step-popup').classList.remove('show');
@@ -142,8 +142,8 @@ function initSynapse() {
     phase = ph;
     // Spawn particles / arrows appropriate to this phase
     phaseParticles(ph, particles, arrows, VESICLES);
-    // Update the step list highlight and popup text
-    setStepUI(PHASES.indexOf(ph) - 1);
+    // Update the step list highlight and popup text (rest=step 0, ap=step 1, etc.)
+    setStepUI(ph === 'rest' ? 0 : PHASES.indexOf(ph));
 
     const isAuto = document.getElementById('cb-auto').checked;
     const idx = PHASES.indexOf(ph);
@@ -229,8 +229,7 @@ function initSynapse() {
       v.cy = v.origCy;
     }
 
-    document.querySelectorAll('.step-row').forEach(el => el.classList.remove('active', 'done'));
-    document.getElementById('step-popup').classList.remove('show');
+    setStepUI(0);  // Step 1: vesicles docked & primed
     document.getElementById('btn-fire').disabled   = false;
     document.getElementById('btn-back').disabled   = true;
     document.getElementById('btn-next').disabled   = true;
@@ -299,6 +298,9 @@ function initSynapse() {
     showInfo(h ? h.key : null, h ? h.id : null);
   });
 
+
+  // Initial state: step 1 (vesicles docked & primed)
+  setStepUI(0);
 
   // Kick off the render loop
   loop();

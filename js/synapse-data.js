@@ -150,28 +150,29 @@ const PARTS = {
 // ── Step popup descriptions ───────────────────────────────────
 const STEP_POPUPS = [
   {
-    tag:   'Step 1; AP',
-    title: 'Action Potential Arrives; SNARE Proteins Appear',
-    body:  'The electrical signal travels down the axon and reaches the terminal. SNARE proteins ' +
-           '(synaptobrevin, syntaxin, SNAP-25) appear at the active zone, linking vesicles to the membrane.',
+    tag:   'Step 1; Docked',
+    title: 'Vesicles Docked & Primed (SNARE Complex)',
+    body:  'Vesicles are already docked and primed at the presynaptic membrane before an action ' +
+           'potential arrives. SNARE proteins (v-SNARE on vesicle, t-SNARE on membrane) mediate ' +
+           'docking and priming, preparing vesicles to fuse quickly when Ca²⁺ rises.',
   },
   {
-    tag:   'Step 2; SNARE',
-    title: 'SNARE Proteins Yank Vesicles to Membrane',
-    body:  'SNARE proteins pull vesicles down to the membrane edge. Vesicles are primed at the ' +
-           'fusion site—but do not open until Ca²⁺ arrives.',
+    tag:   'Step 2; AP',
+    title: 'Action Potential Arrives',
+    body:  'The electrical signal travels down the axon and reaches the terminal. The depolarization ' +
+           'of the presynaptic terminal triggers the next step.',
   },
   {
     tag:   'Step 3; VGCCs',
-    title: 'Ca²⁺ Channels Open',
-    body:  'The voltage change opens voltage-gated Ca²⁺ channels (VGCCs). Ca²⁺ flows in from the ' +
-           'cleft into the terminal.',
+    title: 'Voltage-Gated Ca²⁺ Channels Open',
+    body:  'The voltage change opens voltage-gated Ca²⁺ channels (VGCCs). Ca²⁺ floods in due to ' +
+           'the depolarization—there is much more Ca²⁺ outside than inside.',
   },
   {
     tag:   'Step 4; Fusion',
-    title: 'Vesicle Merges; Glutamate Released',
-    body:  'The vesicle merges with the membrane (and disappears). Glutamate is released from ' +
-           'the fusion site—the membrane opening—not from the VGCC. The VGCC only triggered the fusion.',
+    title: 'Ca²⁺ Triggers Fusion; Glutamate Released',
+    body:  'Ca²⁺ binds synaptotagmin, which triggers the SNARE complex to pull vesicle and membrane ' +
+           'together → vesicle fusion. Glutamate is released into the cleft.',
   },
   {
     tag:   'Step 5; Binding',
@@ -182,7 +183,7 @@ const STEP_POPUPS = [
   },
   {
     tag:   'Step 6; AMPA',
-    title: 'Glutamate Triggers AMPA; Na⁺ Flows In',
+    title: 'AMPA Receptors Open; Na⁺ Flows In',
     body:  'Glutamate unbinds (disappears) as AMPA receptors open. Na⁺ flows in, depolarizing the ' +
            'cell within 1–2 ms. This is the fast excitatory signal (EPSP).',
   },
@@ -217,7 +218,8 @@ const FUSE_TARGETS = [
 
 /**
  * Build the vesicle array for both columns.
- * First 3 per column: start docked at active zone; step 2 shows SNARE lines; step 4 fuses (moves down).
+ * First 3 per column: start docked and primed at the membrane (SNARE complex).
+ * Vesicles are already at the fusion site before the action potential arrives.
  */
 function buildVesicles() {
   const vesicles = [];
@@ -226,18 +228,23 @@ function buildVesicles() {
     for (let i = 0; i < VPOS_REL.length; i++) {
       const ox = cx + VPOS_REL[i][0];
       const oy = PRE_TOP + VPOS_REL[i][1];
+      const docked = i < 3;
+      const fuseIdx = ox < cx - 15 ? 0 : (ox > cx + 15 ? 2 : 1);
+      const t = FUSE_TARGETS[fuseIdx];
+      const tx = cx + t.dx;
+      const ty = PRE_BOT + t.dy;
       vesicles.push({
         id:          col * VPOS_REL.length + i,
         col,
-        cx:          ox,
-        cy:          oy,
+        cx:          docked ? tx : ox,
+        cy:          docked ? ty : oy,
         origCx:      ox,
         origCy:      oy,
         r:           12,
-        docked:      i < 3,
+        docked,
         released:    false,
         fusing:      false,
-        stuckAtMembrane: false,
+        stuckAtMembrane: docked,
         fuseProgress: 0,
       });
     }

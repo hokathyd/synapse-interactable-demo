@@ -166,20 +166,15 @@ function drawVGCCs(ctx, phase) {
 }
 
 /**
- * Draw SNARE tether lines between docked vesicles and the membrane.
- * Only shown from step 2 (snare) onward until fusion starts.
+ * Draw SNARE complex at membrane for docked vesicles.
+ * Vesicles are already docked and primed at rest; SNARE visible until fusion.
  */
 function drawSnareTethers(ctx, VESICLES, phase) {
-  const SNARE_COL = 'rgba(140,160,180,.55)';
-  const SNARE_WIDTH = 1.5;
-
-  // SNARE lines appear in step 1 (ap), pull vesicles down in step 2 (snare)
-  const showSnare = ['ap', 'snare'].includes(phase);
+  // SNARE visible from rest through vgcc (until fusion releases vesicles)
+  const showSnare = ['rest', 'ap', 'vgcc'].includes(phase);
 
   for (const v of VESICLES) {
-    // Show tethers during snare (docked or being yanked down); hide once at membrane
-    const showTether = v.docked || v.fusing;
-    if (!showSnare || !showTether || v.stuckAtMembrane || v.released) continue;
+    if (!showSnare || v.released || !v.docked || !v.stuckAtMembrane) continue;
 
     const cx = COLS[v.col].cx;
     const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
@@ -187,19 +182,7 @@ function drawSnareTethers(ctx, VESICLES, phase) {
     const mx = cx + t.dx;
     const my = PRE_BOT + t.dy;
 
-    // Tether from vesicle bottom to membrane fusion site
-    const vx = v.cx;
-    const vy = v.cy + v.r;
-
-    ctx.beginPath();
-    ctx.moveTo(vx, vy);
-    ctx.lineTo(mx, my);
-    ctx.strokeStyle = SNARE_COL;
-    ctx.lineWidth = SNARE_WIDTH;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    // Small bridge shape at membrane contact (SNARE complex)
+    // SNARE complex bridge at membrane (vesicles docked and primed)
     ctx.beginPath();
     ctx.arc(mx, my, 4, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(160,180,200,.5)';
@@ -212,7 +195,7 @@ function drawSnareTethers(ctx, VESICLES, phase) {
 
 /**
  * Draw synaptic vesicles.
- * Step 2: SNARE yanks vesicles down to membrane. Step 5: vesicle fuses (releases glutamate).
+ * Vesicles start docked at membrane. Fusion phase releases glutamate.
  */
 function drawVesicles(ctx, VESICLES) {
   for (const v of VESICLES) {
