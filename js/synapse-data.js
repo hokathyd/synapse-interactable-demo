@@ -208,11 +208,11 @@ const VPOS_REL = [
   [-36,  TERM_R * .20], [ 36,  TERM_R * .20],                        // between each, slightly down
 ];
 
-// Fusion targets: left/right 2x out and up on arc; center stays
+// Fusion targets: L-shaped; left up+right, center stays, right up+left
 const FUSE_TARGETS = [
-  { dx: -90, dy: -18 },   // left: 2x left, up
+  { dx: -72, dy: -48 },   // left: up and to the right
   { dx:   0, dy:  -8 },   // center
-  { dx:  90, dy: -18 },   // right: 2x right, up
+  { dx:  72, dy: -48 },   // right: up and to the left
 ];
 
 /**

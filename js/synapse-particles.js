@@ -121,16 +121,14 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 5: Glutamate continues from cleft into AMPA receptors, binds ──
+    // ── Step 5: Glutamate continues from cleft into AMPA receptors, binds (flow only, no arrows) ──
     case 'release':
-      // 2 arrows per column: from cleft (release site) to AMPA receptors
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
         const cleftY = CLEFT_T + CLEFT_H * .5;
         for (let vi = 0; vi < 2; vi++) {
           const tgtX = cx + AMPA_DX[vi];
           spawnDir(particles, 'glu', cx, cleftY, tgtX, POST_T, 6, true);
-          spawnArrow(arrows, cx, cleftY - 5, tgtX, POST_T, ION_COLORS.glu, 95);
         }
       }
       break;
@@ -160,16 +158,16 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 8: Ca²⁺ activates CaMKII → LTP ──
+    // ── Step 8: Ca²⁺ activates CaMKII → LTP (flow only, no arrows; 2 directions toward CaMKII) ──
     case 'camkii':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
+        const srcX = cx + NMDA_DX[0];
+        const srcY = POST_T + 155;
         for (let ki = 0; ki < 2; ki++) {
           const kx = cx + (ki === 0 ? -48 : 48);
           const ky = CAMKII_DY[ki];
-          for (const dx of NMDA_DX) {
-            spawnArrow(arrows, cx + dx, POST_T + 160, kx, ky, ION_COLORS.ca, 105);
-          }
+          spawnDir(particles, 'ca2', srcX, srcY, kx, ky, 10);
         }
       }
       break;
