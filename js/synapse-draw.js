@@ -267,46 +267,84 @@ function drawCleft(ctx, particles) {
 function drawStaticIons(ctx, particles, W) {
   const animating = particles.some(p => ['glu','ca','na','ca2'].includes(p.type));
 
-  // ── Cleft ions (extracellular; more Ca²⁺ to show source for VGCC entry) ──
+  // ── Cleft ions (extracellular: Na⁺ dominant ~140 mM, Ca²⁺ ~1–2 mM, K⁺ low ~4 mM) ──
   const cleftIons = [
-    { col: ION_RGBA.ca(.85),  x: W * .12, y: CLEFT_T + CLEFT_H * .25 },
-    { col: ION_RGBA.ca(.8),   x: W * .22, y: CLEFT_T + CLEFT_H * .55 },
-    { col: ION_RGBA.ca(.75),  x: W * .18, y: CLEFT_T + CLEFT_H * .75 },
-    { col: ION_RGBA.ca(.8),   x: W * .48, y: CLEFT_T + CLEFT_H * .35 },
-    { col: ION_RGBA.ca(.75),  x: W * .52, y: CLEFT_T + CLEFT_H * .65 },
-    { col: ION_RGBA.ca(.8),   x: W * .78, y: CLEFT_T + CLEFT_H * .28 },
-    { col: ION_RGBA.ca(.75),  x: W * .82, y: CLEFT_T + CLEFT_H * .72 },
-    { col: ION_RGBA.na(.75),  x: W * .32, y: CLEFT_T + CLEFT_H * .58 },
-    { col: ION_RGBA.k(.75),   x: W * .58, y: CLEFT_T + CLEFT_H * .42 },
-    { col: ION_RGBA.mg(.85),  x: W * .72, y: CLEFT_T + CLEFT_H * .62 },
-    { col: ION_RGBA.glu(.6),  x: W * .88, y: CLEFT_T + CLEFT_H * .38 },
+    { col: ION_RGBA.na(.82),  x: W * .08, y: CLEFT_T + CLEFT_H * .22 },
+    { col: ION_RGBA.na(.78),  x: W * .18, y: CLEFT_T + CLEFT_H * .48 },
+    { col: ION_RGBA.na(.8),   x: W * .14, y: CLEFT_T + CLEFT_H * .72 },
+    { col: ION_RGBA.na(.76),  x: W * .28, y: CLEFT_T + CLEFT_H * .35 },
+    { col: ION_RGBA.na(.78),  x: W * .38, y: CLEFT_T + CLEFT_H * .62 },
+    { col: ION_RGBA.na(.8),   x: W * .52, y: CLEFT_T + CLEFT_H * .28 },
+    { col: ION_RGBA.na(.76),  x: W * .58, y: CLEFT_T + CLEFT_H * .55 },
+    { col: ION_RGBA.na(.78),  x: W * .68, y: CLEFT_T + CLEFT_H * .42 },
+    { col: ION_RGBA.na(.8),   x: W * .78, y: CLEFT_T + CLEFT_H * .68 },
+    { col: ION_RGBA.na(.76),  x: W * .88, y: CLEFT_T + CLEFT_H * .38 },
+    { col: ION_RGBA.ca(.8),   x: W * .22, y: CLEFT_T + CLEFT_H * .58 },
+    { col: ION_RGBA.ca(.75),  x: W * .48, y: CLEFT_T + CLEFT_H * .45 },
+    { col: ION_RGBA.ca(.78),  x: W * .72, y: CLEFT_T + CLEFT_H * .32 },
+    { col: ION_RGBA.k(.42),   x: W * .42, y: CLEFT_T + CLEFT_H * .78 },
+    { col: ION_RGBA.mg(.7),   x: W * .62, y: CLEFT_T + CLEFT_H * .18 },
+    { col: ION_RGBA.glu(.5),  x: W * .92, y: CLEFT_T + CLEFT_H * .52 },
   ];
   if (!animating) {
     drawIonGroup(ctx, cleftIons);
   }
 
-  // ── Presynaptic Ca²⁺ (low concentration at rest) ──
+  // ── Axon rectangle (above semicircle): K⁺ dominant, low Na⁺, very little Ca²⁺ ──
   if (!['vgcc','fusion'].includes(window._synapsePhase)) {
     for (let ci = 0; ci < 2; ci++) {
       const cx = COLS[ci].cx;
-      const preIons = [
-        { col: ION_RGBA.ca(.28), x: cx - 40, y: PRE_TOP + 45 },
-        { col: ION_RGBA.ca(.28), x: cx + 30, y: PRE_TOP + 60 },
-        { col: ION_RGBA.ca(.28), x: cx - 15, y: PRE_TOP + 85 },
-        { col: ION_RGBA.ca(.28), x: cx + 50, y: PRE_TOP + 75 },
+      const axonIons = [
+        { col: ION_RGBA.k(.7),   x: cx - 40, y: 45 },
+        { col: ION_RGBA.k(.66),  x: cx + 35, y: 70 },
+        { col: ION_RGBA.k(.68),  x: cx - 15, y: 110 },
+        { col: ION_RGBA.k(.7),   x: cx + 50, y: 95 },
+        { col: ION_RGBA.k(.68),  x: cx - 55, y: 145 },
+        { col: ION_RGBA.k(.66),  x: cx + 20, y: 155 },
+        { col: ION_RGBA.na(.2),  x: cx - 70, y: 85 },
+        { col: ION_RGBA.na(.22), x: cx + 65, y: 125 },
       ];
-      drawIonGroup(ctx, preIons);
+      drawIonGroup(ctx, axonIons);
     }
   }
 
-  // ── Postsynaptic Na⁺ / K⁺ ──
-  const postIons = [
-    { col: ION_RGBA.na(.3), x: W * .22, y: POST_T + 90 },
-    { col: ION_RGBA.k(.3),  x: W * .38, y: POST_T + 110 },
-    { col: ION_RGBA.na(.3), x: W * .62, y: POST_T + 90 },
-    { col: ION_RGBA.k(.3),  x: W * .78, y: POST_T + 115 },
-  ];
-  drawIonGroup(ctx, postIons);
+  // ── Terminal semicircle: K⁺ dominant, very little Ca²⁺ (~100 nM), low Na⁺ ──
+  if (!['vgcc','fusion'].includes(window._synapsePhase)) {
+    for (let ci = 0; ci < 2; ci++) {
+      const cx = COLS[ci].cx;
+      const termIons = [
+        { col: ION_RGBA.k(.72),  x: cx - 45, y: PRE_TOP + 35 },
+        { col: ION_RGBA.k(.68),  x: cx - 20, y: PRE_TOP + 55 },
+        { col: ION_RGBA.k(.7),   x: cx + 25, y: PRE_TOP + 45 },
+        { col: ION_RGBA.k(.66),  x: cx - 35, y: PRE_TOP + 75 },
+        { col: ION_RGBA.k(.7),   x: cx + 40, y: PRE_TOP + 65 },
+        { col: ION_RGBA.k(.68),  x: cx + 5,  y: PRE_TOP + 85 },
+        { col: ION_RGBA.na(.22), x: cx - 55, y: PRE_TOP + 60 },
+        { col: ION_RGBA.na(.2),  x: cx + 55, y: PRE_TOP + 50 },
+        { col: ION_RGBA.ca(.12), x: cx - 10, y: PRE_TOP + 70 },
+      ];
+      drawIonGroup(ctx, termIons);
+    }
+  }
+
+  // ── Dendrite spine (inside each spine box): K⁺ dominant, low Na⁺ ──
+  for (let ci = 0; ci < 2; ci++) {
+    const cx = COLS[ci].cx;
+    const spineIons = [
+      { col: ION_RGBA.k(.68),  x: cx - 55, y: POST_T + 55 },
+      { col: ION_RGBA.k(.7),   x: cx - 25, y: POST_T + 85 },
+      { col: ION_RGBA.k(.66),  x: cx + 35, y: POST_T + 65 },
+      { col: ION_RGBA.k(.7),   x: cx - 45, y: POST_T + 125 },
+      { col: ION_RGBA.k(.68),  x: cx + 5,  y: POST_T + 140 },
+      { col: ION_RGBA.k(.66),  x: cx + 50, y: POST_T + 110 },
+      { col: ION_RGBA.k(.7),   x: cx - 30, y: POST_T + 175 },
+      { col: ION_RGBA.k(.68),  x: cx + 40, y: POST_T + 195 },
+      { col: ION_RGBA.k(.66),  x: cx - 60, y: POST_T + 210 },
+      { col: ION_RGBA.na(.18), x: cx - 70, y: POST_T + 95 },
+      { col: ION_RGBA.na(.2),  x: cx + 65, y: POST_T + 155 },
+    ];
+    drawIonGroup(ctx, spineIons);
+  }
 }
 
 /** Draw a group of ion dots (no labels). */
