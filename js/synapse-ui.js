@@ -27,11 +27,11 @@ function initSynapse() {
   const ctx    = canvas.getContext('2d');
 
   // ── Phase order ──────────────────────────────────
-  const PHASES = ['rest','ap','snare','vgcc','ca_in','fusion','release','ampa_open','nmda_open','camkii'];
+  const PHASES = ['rest','ap','snare','vgcc','fusion','release','ampa_open','nmda_open','camkii'];
 
   // How many ticks each phase lasts before auto-advancing (at 1× speed)
   const PHASE_DURATIONS = {
-    ap: 85, snare: 90, vgcc: 95, ca_in: 100, fusion: 110,
+    ap: 85, snare: 90, vgcc: 95, fusion: 110,
     release: 105, ampa_open: 120, nmda_open: 130,
     camkii: 99999, // stays until manually advanced
   };
@@ -95,7 +95,22 @@ function initSynapse() {
     particles.length = 0;
     if (prevPhase === 'fusion') {
       for (const v of VESICLES) {
-        if (v.docked) v.fusing = true;
+        if (v.docked) v.stuckAtMembrane = true;
+      }
+    } else if (prevPhase === 'vgcc') {
+      for (const v of VESICLES) {
+        if (v.docked) {
+          v.stuckAtMembrane = true;
+          v.fusing = false;
+          const cx = COLS[v.col].cx;
+          const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
+          const t = FUSE_TARGETS[fuseIdx];
+          v.cx = cx + t.dx;
+          v.cy = PRE_BOT + t.dy;
+        } else {
+          v.cx = v.origCx;
+          v.cy = v.origCy;
+        }
       }
     }
     if (prevPhase === 'rest') {

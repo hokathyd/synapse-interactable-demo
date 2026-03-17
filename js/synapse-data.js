@@ -151,15 +151,15 @@ const PARTS = {
 const STEP_POPUPS = [
   {
     tag:   'Step 1; AP',
-    title: 'Action Potential Arrives',
-    body:  'The electrical signal travels down the axon and reaches the terminal. This voltage ' +
-           'change is the trigger for everything that follows.',
+    title: 'Action Potential Arrives; SNARE Proteins Appear',
+    body:  'The electrical signal travels down the axon and reaches the terminal. SNARE proteins ' +
+           '(synaptobrevin, syntaxin, SNAP-25) appear at the active zone, linking vesicles to the membrane.',
   },
   {
     tag:   'Step 2; SNARE',
-    title: 'SNARE Proteins at Active Zone',
-    body:  'SNARE proteins (synaptobrevin, syntaxin, SNAP-25) hold vesicles docked at the membrane. ' +
-           'Vesicles are primed—but do not fuse until Ca²⁺ arrives.',
+    title: 'SNARE Proteins Yank Vesicles to Membrane',
+    body:  'SNARE proteins pull vesicles down to the membrane edge. Vesicles are primed at the ' +
+           'fusion site—but do not open until Ca²⁺ arrives.',
   },
   {
     tag:   'Step 3; VGCCs',
@@ -168,38 +168,32 @@ const STEP_POPUPS = [
            'cleft into the terminal.',
   },
   {
-    tag:   'Step 4; Ca²⁺',
-    title: 'Ca²⁺ Triggers Fusion',
-    body:  'Ca²⁺ binds to synaptotagmin on the already-docked vesicles. This triggers the final ' +
-           'SNARE-mediated fusion step: the vesicle merges with the membrane and opens to release glutamate.',
-  },
-  {
-    tag:   'Step 5; Fusion',
+    tag:   'Step 4; Fusion',
     title: 'Vesicle Merges; Glutamate Released',
     body:  'The vesicle merges with the membrane (and disappears). Glutamate is released from ' +
            'the fusion site—the membrane opening—not from the VGCC. The VGCC only triggered the fusion.',
   },
   {
-    tag:   'Step 6; Binding',
+    tag:   'Step 5; Binding',
     title: 'Glutamate Crosses Cleft; Binds to AMPA',
     body:  'Glutamate diffuses across the narrow cleft (10–20 nm) in under half a millisecond. ' +
            'It binds to AMPA receptors on the postsynaptic membrane and stays there—' +
            'it does not pass through the cell.',
   },
   {
-    tag:   'Step 7; AMPA',
+    tag:   'Step 6; AMPA',
     title: 'Glutamate Triggers AMPA; Na⁺ Flows In',
     body:  'Glutamate unbinds (disappears) as AMPA receptors open. Na⁺ flows in, depolarizing the ' +
            'cell within 1–2 ms. This is the fast excitatory signal (EPSP).',
   },
   {
-    tag:   'Step 8; NMDA',
+    tag:   'Step 7; NMDA',
     title: 'NMDA Unblocks; Ca²⁺ Enters',
     body:  'NMDA receptors are blocked by Mg²⁺ at rest. The depolarization from AMPA pushes ' +
            'Mg²⁺ out, so Ca²⁺ (and Na⁺) can now flow in. This Ca²⁺ signal drives plasticity.',
   },
   {
-    tag:   'Step 9; LTP',
+    tag:   'Step 8; LTP',
     title: 'CaMKII Strengthens the Synapse',
     body:  'Ca²⁺ from NMDA activates CaMKII. CaMKII adds more AMPA receptors to the membrane and ' +
            'makes them more responsive. The synapse is potentiated long-term; this is LTP.',

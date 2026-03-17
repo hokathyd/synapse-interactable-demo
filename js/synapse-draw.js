@@ -122,7 +122,7 @@ function drawPresynaptic(ctx, phase, VESICLES) {
  * on the curved surface of each terminal.
  */
 function drawVGCCs(ctx, phase) {
-  const vgccOpen = ['vgcc', 'ca_in', 'fusion'].includes(phase);
+  const vgccOpen = ['vgcc', 'fusion'].includes(phase);
 
   for (let ci = 0; ci < 2; ci++) {
     const cx = COLS[ci].cx;
@@ -173,11 +173,13 @@ function drawSnareTethers(ctx, VESICLES, phase) {
   const SNARE_COL = 'rgba(140,160,180,.55)';
   const SNARE_WIDTH = 1.5;
 
-  // SNARE lines appear in step 2 (snare) and stay through step 3 (vgcc) until fusion
-  const showSnare = ['snare', 'vgcc'].includes(phase);
+  // SNARE lines appear in step 1 (ap), pull vesicles down in step 2 (snare)
+  const showSnare = ['ap', 'snare'].includes(phase);
 
   for (const v of VESICLES) {
-    if (!showSnare || !v.docked || v.fusing || v.stuckAtMembrane || v.released) continue;
+    // Show tethers during snare (docked or being yanked down); hide once at membrane
+    const showTether = v.docked || v.fusing;
+    if (!showSnare || !showTether || v.stuckAtMembrane || v.released) continue;
 
     const cx = COLS[v.col].cx;
     const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
@@ -210,13 +212,13 @@ function drawSnareTethers(ctx, VESICLES, phase) {
 
 /**
  * Draw synaptic vesicles.
- * Vesicles start docked; step 4: fuse (move down to membrane).
+ * Step 2: SNARE yanks vesicles down to membrane. Step 5: vesicle fuses (releases glutamate).
  */
 function drawVesicles(ctx, VESICLES) {
   for (const v of VESICLES) {
     if (v.released) continue;  // hidden when merged
 
-    // Fusing animation (step 4): vesicle moves down to fusion site
+    // Step 2: SNARE yanks vesicle down to fusion site
     if (v.fusing) {
       v.fuseProgress = Math.min(1, (v.fuseProgress || 0) + 0.02);
       const fp  = v.fuseProgress;
@@ -301,7 +303,7 @@ function drawStaticIons(ctx, particles, W) {
   }
 
   // ── Presynaptic Ca²⁺ (low concentration at rest) ──
-  if (!['vgcc','ca_in','fusion'].includes(window._synapsePhase)) {
+  if (!['vgcc','fusion'].includes(window._synapsePhase)) {
     for (let ci = 0; ci < 2; ci++) {
       const cx = COLS[ci].cx;
       const preIons = [

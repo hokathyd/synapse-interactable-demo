@@ -61,8 +61,16 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 2: SNARE lines appear only (no vesicle movement) ──
+    // ── Step 2: SNARE lines appear, then yank vesicles down to membrane ──
     case 'snare':
+      for (const v of VESICLES) {
+        if (v.docked && !v.stuckAtMembrane && !v.released) {
+          v.fusing = true;
+          v.fuseProgress = 0;
+          v.cx = v.origCx;
+          v.cy = v.origCy;
+        }
+      }
       break;
 
     // ── Step 3: VGCCs open; Ca²⁺ enters (only Ca²⁺ movement) ──
@@ -81,28 +89,6 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
           const dstY = vy - Math.sin(ang) * perp;
           spawnDir(particles, 'ca', srcX, srcY, dstX, dstY, 12);
           spawnArrow(arrows, srcX, srcY, dstX, dstY, ION_COLORS.ca, 115);
-        }
-      }
-      break;
-
-    // ── Step 4: Ca²⁺ triggers fusion of docked vesicles ──
-    case 'ca_in':
-      for (const v of VESICLES) {
-        if (!v.docked) continue;
-        v.fusing      = true;
-        v.fuseProgress = 0;
-        v.cx = v.origCx; v.cy = v.origCy; // reset for replay
-      }
-      const vesTargetY = PRE_TOP + TERM_R * .15;
-      for (let ci = 0; ci < 2; ci++) {
-        const cx = COLS[ci].cx;
-        for (let vi = 0; vi < 2; vi++) {
-          const ang = VGCC_ANGLES[vi];
-          const vx = cx + Math.cos(ang) * TERM_R;
-          const vy = PRE_TOP + Math.sin(ang) * TERM_R;
-          const caFromX = vx - Math.cos(ang) * 35;
-          const caFromY = vy - Math.sin(ang) * 35;
-          spawnDir(particles, 'ca', caFromX, caFromY, cx, vesTargetY, 8);
         }
       }
       break;
