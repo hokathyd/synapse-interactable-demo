@@ -186,12 +186,18 @@ button:active { transform: scale(.95); }
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
+  position: relative;
 }
 .topbar h1 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-family: 'Nunito', sans-serif;
   font-size: .98rem;
   font-weight: 800;
   color: #3a2d5e;
+  margin: 0;
+  white-space: nowrap;
 }
 
 .back-btn {

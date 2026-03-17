@@ -125,8 +125,7 @@ function drawVGCCs(ctx, phase) {
 
   for (let ci = 0; ci < 2; ci++) {
     const cx = COLS[ci].cx;
-    // Two VGCC positions on the arc, symmetric around center (π/2)
-    const vgccAngles = [Math.PI * .45, Math.PI * .55];
+    const vgccAngles = VGCC_ANGLES;
 
     for (let vi = 0; vi < 2; vi++) {
       const ang = vgccAngles[vi];
@@ -171,18 +170,19 @@ function drawVGCCs(ctx, phase) {
  */
 function drawVesicles(ctx, VESICLES) {
   for (const v of VESICLES) {
-    if (v.released) continue;
+    if (v.released) continue;  // hidden when merged (step 4)
 
-    // Fusing animation: vesicle creeps toward the arc membrane
+    // Fusing animation: vesicle moves toward its fusion site (left, between, or right of VGCCs)
     if (v.fusing) {
-      v.fuseProgress = Math.min(1, (v.fuseProgress || 0) + 0.025);
+      v.fuseProgress = Math.min(1, (v.fuseProgress || 0) + 0.02);
       const fp  = v.fuseProgress;
-        const ang = v.cx < COLS[v.col].cx ? (Math.PI * .55) : (Math.PI * .45);
-      const tx  = COLS[v.col].cx + Math.cos(ang) * TERM_R * (1 - fp * 0.3);
-      const ty  = PRE_TOP + Math.sin(ang) * TERM_R * (1 - fp * 0.3);
+      const cx  = COLS[v.col].cx;
+      const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);  // left, center, right
+      const tx = cx + FUSE_DX[fuseIdx];
+      const ty = PRE_BOT - 8;  // fusion site on presynaptic membrane
       v.cx = v.origCx + (tx - v.origCx) * fp;
       v.cy = v.origCy + (ty - v.origCy) * fp;
-      if (fp >= 1) { v.fusing = false; v.released = true; continue; }
+      if (fp >= 1) { v.fusing = false; v.stuckAtMembrane = true; }  // fused at membrane; released in step 4
     }
 
     const isH = hov === 'vesicle' && hovId === v.id;
@@ -197,10 +197,11 @@ function drawVesicles(ctx, VESICLES) {
     ctx.fill(); ctx.stroke();
 
     // Glutamate dots inside
+    const dotR = Math.min(2.8, v.r * .28);
     for (let di = 0; di < 3; di++) {
       const da = (di / 3) * Math.PI * 2 - Math.PI / 2;
       ctx.beginPath();
-      ctx.arc(v.cx + Math.cos(da) * v.r * .44, v.cy + Math.sin(da) * v.r * .44, 2.8, 0, Math.PI * 2);
+      ctx.arc(v.cx + Math.cos(da) * v.r * .44, v.cy + Math.sin(da) * v.r * .44, dotR, 0, Math.PI * 2);
       ctx.fillStyle = ION_COLORS.glu;
       ctx.fill();
     }
@@ -236,13 +237,19 @@ function drawCleft(ctx, particles) {
 function drawStaticIons(ctx, particles, W) {
   const animating = particles.some(p => ['glu','ca','na','ca2'].includes(p.type));
 
-  // ── Cleft ions (no labels) ──
+  // ── Cleft ions (extracellular; more Ca²⁺ to show source for VGCC entry) ──
   const cleftIons = [
-    { col: ION_RGBA.ca(.75),  x: W * .15, y: CLEFT_T + CLEFT_H * .38 },
-    { col: ION_RGBA.na(.75),  x: W * .30, y: CLEFT_T + CLEFT_H * .62 },
-    { col: ION_RGBA.k(.75),   x: W * .50, y: CLEFT_T + CLEFT_H * .38 },
-    { col: ION_RGBA.mg(.85),  x: W * .68, y: CLEFT_T + CLEFT_H * .62 },
-    { col: ION_RGBA.glu(.6),  x: W * .84, y: CLEFT_T + CLEFT_H * .38 },
+    { col: ION_RGBA.ca(.85),  x: W * .12, y: CLEFT_T + CLEFT_H * .25 },
+    { col: ION_RGBA.ca(.8),   x: W * .22, y: CLEFT_T + CLEFT_H * .55 },
+    { col: ION_RGBA.ca(.75),  x: W * .18, y: CLEFT_T + CLEFT_H * .75 },
+    { col: ION_RGBA.ca(.8),   x: W * .48, y: CLEFT_T + CLEFT_H * .35 },
+    { col: ION_RGBA.ca(.75),  x: W * .52, y: CLEFT_T + CLEFT_H * .65 },
+    { col: ION_RGBA.ca(.8),   x: W * .78, y: CLEFT_T + CLEFT_H * .28 },
+    { col: ION_RGBA.ca(.75),  x: W * .82, y: CLEFT_T + CLEFT_H * .72 },
+    { col: ION_RGBA.na(.75),  x: W * .32, y: CLEFT_T + CLEFT_H * .58 },
+    { col: ION_RGBA.k(.75),   x: W * .58, y: CLEFT_T + CLEFT_H * .42 },
+    { col: ION_RGBA.mg(.85),  x: W * .72, y: CLEFT_T + CLEFT_H * .62 },
+    { col: ION_RGBA.glu(.6),  x: W * .88, y: CLEFT_T + CLEFT_H * .38 },
   ];
   if (!animating) {
     drawIonGroup(ctx, cleftIons);
@@ -456,7 +463,7 @@ function drawCaMKII(ctx, phase) {
   for (let ci = 0; ci < 2; ci++) {
     const cx = COLS[ci].cx;
     for (let ki = 0; ki < 2; ki++) {
-      const kx    = cx + (ki === 0 ? -38 : 38);
+      const kx    = cx + (ki === 0 ? -48 : 48);
       const ky    = CAMKII_DY[ki];
       const pulse = ckOn ? .5 + .5 * Math.sin(tick * .09) : 0;
       const isH   = hov === 'camkii' && hovId === ci * 10 + ki;
@@ -490,7 +497,19 @@ function drawCaMKII(ctx, phase) {
 function drawParticles(ctx, particles) {
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
-    p.x += p.vx; p.y += p.vy; p.life--;
+    // Glutamate with bindTarget: stick at receptor when arrived
+    if (p.bindTarget && !p.bound) {
+      const dy = p.bindTarget.y - p.y;
+        if (dy <= 4 && Math.abs(p.x - p.bindTarget.x) < 12) {
+        p.bound = true;
+        p.x = p.bindTarget.x + (Math.random() - 0.5) * 14;
+        p.y = p.bindTarget.y;
+        p.vx = 0; p.vy = 0; p.life = 999;
+      }
+    }
+    if (!p.bound) {
+      p.x += p.vx; p.y += p.vy; p.life--;
+    }
     if (p.life <= 0) { particles.splice(i, 1); continue; }
 
     const al = Math.min(1, p.life / 18);

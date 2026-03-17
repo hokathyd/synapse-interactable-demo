@@ -14,16 +14,15 @@
 
 const AXON_BOT  = 180;           // bottom of the axon column rectangles
 const PRE_TOP   = AXON_BOT;      // top of the semicircular terminal bulge
-const TERM_R    = 120;           // radius of each terminal semicircle
-const PRE_BOT   = PRE_TOP + TERM_R;  // = 300; bottom of terminals / top of cleft
+const TERM_R    = 100;           // radius of terminal semicircle (shorter; spine+shaft ≈ terminal)
+const PRE_BOT   = PRE_TOP + TERM_R;  // bottom of terminals / top of cleft
 
 const CLEFT_T   = PRE_BOT;       // top of synaptic cleft
-const CLEFT_H   = 44;            // height of cleft band
-const POST_T    = CLEFT_T + CLEFT_H; // = 344; top of dendritic spines
+const CLEFT_H   = 127;           // height of cleft band
+const POST_T    = CLEFT_T + CLEFT_H; // top of dendritic spines
 
-// Spine height: stretch to leave room for CaMKII + fill canvas
-const POST_BOT  = POST_T + 230;  // = 574; bottom of spine boxes / top of dendrite shaft
-const SHAFT_H   = 106;           // dendrite shaft occupies the remaining canvas height
+// Spine + shaft ≈ terminal height; space from shorter terminal added to spine
+const POST_BOT  = POST_T + 233;  // bottom of spine boxes / top of dendrite shaft
 
 // Horizontal columns (only 2, shifted right to avoid label overlap)
 const COLS = [{ cx: 270 }, { cx: 570 }];
@@ -33,13 +32,21 @@ const BOX_W       = TERM_R * 2;   // = 240
 const BOX_SPINE_W = BOX_W;
 
 // AMPA receptor x-offsets relative to each column centre (centered in spine)
-const AMPA_DX = [-65, 65];  // two AMPA receptors, symmetric around center
+const AMPA_DX = [-80, 80];  // two AMPA receptors, symmetric (wider spine)
+
+// VGCC positions and angles (matches drawVGCCs .35π and .65π)
+const VGCC_ANGLES = [Math.PI * .35, Math.PI * .65];
+const VGCC_DX = [Math.round(TERM_R * Math.cos(VGCC_ANGLES[0])), Math.round(TERM_R * Math.cos(VGCC_ANGLES[1]))];
+const VGCC_DY = Math.round(TERM_R * Math.sin(VGCC_ANGLES[0]));
+
+// Fusion site x-offsets: left of VGCC, between VGCCs, right of VGCC
+const FUSE_DX = [-45, 0, 45];
 
 // NMDA receptor x-offset; centred between the two AMPA receptors
 const NMDA_DX = [0];       // center of spine
 
 // CaMKII positions (y) inside each spine, two per spine
-const CAMKII_DY = [POST_T + 140, POST_T + 168];
+const CAMKII_DY = [POST_T + 155, POST_T + 195];
 
 // Ion/molecule colors (hex); use consistently across diagram, particles, arrows
 const ION_COLORS = {
@@ -153,31 +160,32 @@ const STEP_POPUPS = [
   {
     tag:   'Step 2; VGCCs',
     title: 'Ca²⁺ Channels Open',
-    body:  'The voltage change opens voltage-gated Ca²⁺ channels (VGCCs) in the terminal membrane. ' +
-           'Ca²⁺ flows in quickly because there is much more outside than inside the cell.',
+    body:  'The voltage change opens voltage-gated Ca²⁺ channels (VGCCs). Ca²⁺ flows in from the ' +
+           'cleft, following the same path as the action potential (yellow line).',
   },
   {
     tag:   'Step 3; Ca²⁺',
-    title: 'Ca²⁺ Triggers Vesicle Fusion',
-    body:  'Ca²⁺ binds to proteins on the docked vesicles. This triggers the vesicle to fuse ' +
-           'with the cell membrane and release its contents.',
+    title: 'Ca²⁺ Reaches Vesicles; Vesicles Fuse with Membrane',
+    body:  'Ca²⁺ binds to proteins on docked vesicles at the active zone. The vesicles move ' +
+           'toward and fuse with the presynaptic membrane (between the VGCCs), not the channel itself.',
   },
   {
     tag:   'Step 4; Fusion',
-    title: 'Vesicle Fuses; Glutamate Released',
-    body:  'The vesicle merges with the membrane and releases ~3,000 glutamate molecules into ' +
-           'the synaptic cleft. This happens in under 1 ms.',
+    title: 'Vesicle Merges; Glutamate Released',
+    body:  'The vesicle merges with the membrane (and disappears). Glutamate is released from ' +
+           'the fusion site—the membrane opening—not from the VGCC. The VGCC only triggered the fusion.',
   },
   {
-    tag:   'Step 5; Diffusion',
-    title: 'Glutamate Crosses the Cleft',
-    body:  'The cleft is very narrow (10–20 nm). Glutamate diffuses across it in under half a ' +
-           'millisecond and binds to receptors on the postsynaptic side.',
+    tag:   'Step 5; Binding',
+    title: 'Glutamate Crosses Cleft; Binds to AMPA',
+    body:  'Glutamate diffuses across the narrow cleft (10–20 nm) in under half a millisecond. ' +
+           'It binds to AMPA receptors on the postsynaptic membrane and stays there—' +
+           'it does not pass through the cell.',
   },
   {
     tag:   'Step 6; AMPA',
-    title: 'AMPA Receptors Open',
-    body:  'Glutamate binds to AMPA receptors and opens them. Na⁺ flows in, depolarizing the ' +
+    title: 'Glutamate Triggers AMPA; Na⁺ Flows In',
+    body:  'Glutamate unbinds (disappears) as AMPA receptors open. Na⁺ flows in, depolarizing the ' +
            'cell within 1–2 ms. This is the fast excitatory signal (EPSP).',
   },
   {
@@ -196,13 +204,10 @@ const STEP_POPUPS = [
 
 
 // ── Vesicle initial positions ─────────────────────────────────
-// Relative to each column centre, expressed as [dx, dy from PRE_TOP]
+// 5 per terminal: top 3, then 1 between each slightly lower; first 3 docked
 const VPOS_REL = [
-  [-TERM_R * .35,  TERM_R * .15],
-  [ TERM_R * .35,  TERM_R * .15],
-  [ 0,             TERM_R * .28],
-  [-TERM_R * .55,  TERM_R * .35],
-  [ TERM_R * .55,  TERM_R * .35],
+  [-72,  TERM_R * .04], [  0,  TERM_R * .04], [ 72,  TERM_R * .04],  // top row; docked
+  [-36,  TERM_R * .20], [ 36,  TERM_R * .20],                        // between each, slightly down
 ];
 
 /**
@@ -218,16 +223,17 @@ function buildVesicles() {
       const ox = cx + VPOS_REL[i][0];
       const oy = PRE_TOP + VPOS_REL[i][1];
       vesicles.push({
-        id:          col * 5 + i,
+        id:          col * VPOS_REL.length + i,
         col,
         cx:          ox,   // current (animated) x
         cy:          oy,   // current (animated) y
         origCx:      ox,   // reset target
         origCy:      oy,
-        r:           16,   // radius in px
-        docked:      i >= 2, // only docked vesicles fuse
+        r:           12,   // all same size
+        docked:      i < 3,  // first 3 per column docked and fuse (left, center, right)
         released:    false,
         fusing:      false,
+        stuckAtMembrane: false,  // step 3: vesicle fused at membrane; step 4: released/disappears
         fuseProgress: 0,   // 0..1 animation progress
       });
     }

@@ -87,6 +87,7 @@ function initSynapse() {
     for (const v of VESICLES) {
       v.fusing = false;
       v.released = false;
+      v.stuckAtMembrane = false;
       v.fuseProgress = 0;
       v.cx = v.origCx;
       v.cy = v.origCy;
@@ -107,6 +108,7 @@ function initSynapse() {
       for (const v of VESICLES) {
         v.fusing = false;
         v.released = false;
+        v.stuckAtMembrane = false;
         v.fuseProgress = 0;
         v.cx = v.origCx;
         v.cy = v.origCy;
@@ -207,6 +209,7 @@ function initSynapse() {
     for (const v of VESICLES) {
       v.fusing      = false;
       v.released    = false;
+      v.stuckAtMembrane = false;
       v.fuseProgress = 0;
       v.cx = v.origCx;
       v.cy = v.origCy;

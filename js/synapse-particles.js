@@ -8,28 +8,29 @@
 
 /**
  * Spawn N particles travelling from (fx,fy) → (tx,ty).
- * Particles are added to the shared `particles` array.
+ * If bindTarget is true, particles stick at (tx,ty) when they arrive.
  */
-function spawnDir(particles, type, fx, fy, tx, ty, n) {
+function spawnDir(particles, type, fx, fy, tx, ty, n, bindTarget) {
   const dx   = tx - fx, dy = ty - fy;
   const dist = Math.sqrt(dx * dx + dy * dy) || 1;
   for (let i = 0; i < n; i++) {
     const t  = Math.random() * .2;
     const sp = .9 + Math.random() * .9;
-    particles.push({
+    const p = {
       type,
       x:  fx + dx * t + (Math.random() - .5) * 5,
       y:  fy + dy * t + (Math.random() - .5) * 5,
       vx: (dx / dist) * sp,
       vy: (dy / dist) * sp,
       life: Math.ceil(dist / sp * (1 + Math.random() * .2)),
-      // Radius by ion type
       r: type === 'ca'  ? 4.5
        : type === 'ca2' ? 4
        : type === 'na'  ? 3.8
        : type === 'ap'  ? 7
        : 3.5,
-    });
+    };
+    if (bindTarget) p.bindTarget = { x: tx, y: ty };
+    particles.push(p);
   }
 }
 
@@ -60,72 +61,90 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 2: VGCCs open; Ca²⁺ enters from outside ──
+    // ── Step 2: VGCCs open; Ca²⁺ enters perpendicular to each VGCC semicircle ──
     case 'vgcc':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
         for (let vi = 0; vi < 2; vi++) {
-          const ang = vi === 0 ? (Math.PI * .55) : (Math.PI * .45);
-          const vx  = cx + Math.cos(ang) * TERM_R;
-          const vy  = PRE_TOP + Math.sin(ang) * TERM_R;
-          // Ca²⁺ flows inward through the VGCC
-          spawnDir(particles, 'ca', vx, AXON_BOT + 25, vx, vy - 5, 12);
-          spawnArrow(arrows, vx, AXON_BOT + 20, vx, vy - 4, ION_COLORS.ca, 95);
+          const ang = VGCC_ANGLES[vi];
+          const vx = cx + Math.cos(ang) * TERM_R;
+          const vy = PRE_TOP + Math.sin(ang) * TERM_R;
+          // Perpendicular: inward normal (-cos, -sin) from membrane into cytoplasm
+          const perp = 45;
+          const srcX = vx + Math.cos(ang) * 25;   // start in cleft (outward from membrane)
+          const srcY = vy + Math.sin(ang) * 25;
+          const dstX = vx - Math.cos(ang) * perp;  // end inside (inward)
+          const dstY = vy - Math.sin(ang) * perp;
+          spawnDir(particles, 'ca', srcX, srcY, dstX, dstY, 12);
+          spawnArrow(arrows, srcX, srcY, dstX, dstY, ION_COLORS.ca, 115);
         }
       }
       break;
 
-    // ── Step 3: Ca²⁺ triggers vesicle fusion ──
+    // ── Step 3: Ca²⁺ continues perpendicular into terminal toward vesicles ──
     case 'ca_in':
       for (const v of VESICLES) {
         if (!v.docked) continue;
         v.fusing      = true;
         v.fuseProgress = 0;
         v.cx = v.origCx; v.cy = v.origCy; // reset for replay
-
-        const ang = v.cx < COLS[v.col].cx ? (Math.PI * .55) : (Math.PI * .45);
-        const vx  = COLS[v.col].cx + Math.cos(ang) * TERM_R;
-        const vy  = PRE_TOP + Math.sin(ang) * TERM_R;
-        spawnDir(particles, 'ca', vx, vy, v.cx, v.cy, 5);
-        spawnArrow(arrows, vx, vy, v.cx, v.cy, ION_COLORS.ca, 80);
+      }
+      const vesTargetY = PRE_TOP + TERM_R * .15;
+      for (let ci = 0; ci < 2; ci++) {
+        const cx = COLS[ci].cx;
+        for (let vi = 0; vi < 2; vi++) {
+          const ang = VGCC_ANGLES[vi];
+          const vx = cx + Math.cos(ang) * TERM_R;
+          const vy = PRE_TOP + Math.sin(ang) * TERM_R;
+          const caFromX = vx - Math.cos(ang) * 35;  // Ca²⁺ that just entered (perpendicular)
+          const caFromY = vy - Math.sin(ang) * 35;
+          spawnDir(particles, 'ca', caFromX, caFromY, cx, vesTargetY, 8);
+          spawnArrow(arrows, caFromX, caFromY, cx, vesTargetY, ION_COLORS.ca, 85);
+        }
       }
       break;
 
-    // ── Step 4: Vesicle fusion; glutamate into cleft ──
+    // ── Step 4: Vesicle disappears (merges); glutamate flows out from 3 fusion sites per terminal ──
     case 'fusion':
       for (const v of VESICLES) {
-        if (!v.fusing) continue;
-        v.fusing   = false;
-        v.released = true;
-        spawnDir(particles, 'glu', v.cx, v.cy, v.cx, CLEFT_T + CLEFT_H * .6, 12);
+        if (v.stuckAtMembrane) v.released = true;  // vesicle disappears now
       }
-      for (const col of COLS) {
-        spawnArrow(arrows, col.cx, PRE_BOT - 5, col.cx, POST_T + 8, ION_COLORS.glu, 95);
+      // Glutamate from 3 points: left of VGCC, between VGCCs, right of VGCC
+      for (let ci = 0; ci < 2; ci++) {
+        const cx = COLS[ci].cx;
+        const fuseY = PRE_BOT + 5;
+        for (let fi = 0; fi < 3; fi++) {
+          const fx = cx + FUSE_DX[fi];
+          spawnDir(particles, 'glu', fx, fuseY, fx, CLEFT_T + CLEFT_H * .5, 6);
+          spawnArrow(arrows, fx, fuseY, fx, CLEFT_T + CLEFT_H * .5, ION_COLORS.glu, 105);
+        }
       }
       break;
 
-    // ── Step 5: Glutamate diffuses to receptors ──
+    // ── Step 5: Glutamate continues from cleft into AMPA receptors, binds ──
     case 'release':
+      // 2 arrows per column: from cleft (release site) to AMPA receptors
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
-        for (const dx of AMPA_DX) {
-          spawnDir(particles, 'glu', cx + dx, CLEFT_T + 4, cx + dx, POST_T + 8, 7);
-          spawnArrow(arrows, cx + dx, CLEFT_T + 3, cx + dx, POST_T + 6, ION_COLORS.glu, 88);
-        }
-        for (const dx of NMDA_DX) {
-          spawnDir(particles, 'glu', cx + dx, CLEFT_T + 4, cx + dx, POST_T + 8, 6);
-          spawnArrow(arrows, cx + dx, CLEFT_T + 3, cx + dx, POST_T + 6, ION_COLORS.glu, 88);
+        const cleftY = CLEFT_T + CLEFT_H * .5;
+        for (let vi = 0; vi < 2; vi++) {
+          const tgtX = cx + AMPA_DX[vi];
+          spawnDir(particles, 'glu', cx, cleftY, tgtX, POST_T, 6, true);
+          spawnArrow(arrows, cx, cleftY - 5, tgtX, POST_T, ION_COLORS.glu, 95);
         }
       }
       break;
 
-    // ── Step 6: AMPA opens; Na⁺ flows in ──
+    // ── Step 6: Glutamate disappears from AMPA; AMPA opens; Na⁺ flows in ──
     case 'ampa_open':
+      for (let i = particles.length - 1; i >= 0; i--) {
+        if (particles[i].type === 'glu') particles.splice(i, 1);
+      }
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
         for (const dx of AMPA_DX) {
-          spawnDir(particles, 'na', cx + dx, POST_T + 5, cx + dx, POST_T + 120, 16);
-          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 110, ION_COLORS.na, 92);
+          spawnDir(particles, 'na', cx + dx, POST_T + 5, cx + dx, POST_T + 155, 16);
+          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 150, ION_COLORS.na, 100);
         }
       }
       break;
@@ -135,8 +154,8 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
         for (const dx of NMDA_DX) {
-          spawnDir(particles, 'ca2', cx + dx, POST_T + 5, cx + dx, POST_T + 130, 18);
-          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 120, ION_COLORS.ca, 98);
+          spawnDir(particles, 'ca2', cx + dx, POST_T + 5, cx + dx, POST_T + 165, 18);
+          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 160, ION_COLORS.ca, 105);
         }
       }
       break;
@@ -146,10 +165,10 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
         for (let ki = 0; ki < 2; ki++) {
-          const kx = cx + (ki === 0 ? -38 : 38);
+          const kx = cx + (ki === 0 ? -48 : 48);
           const ky = CAMKII_DY[ki];
           for (const dx of NMDA_DX) {
-            spawnArrow(arrows, cx + dx, POST_T + 120, kx, ky, ION_COLORS.ca, 98);
+            spawnArrow(arrows, cx + dx, POST_T + 160, kx, ky, ION_COLORS.ca, 105);
           }
         }
       }
