@@ -25,20 +25,20 @@
 
   // ── Neuron geometry ───────────────────────────────
   const PRE     = { sx: 155, sy: MID, r: 30 };  // presynaptic soma
-  const BOUTON_R = 20;                            // axon terminal radius
-  const PRE_TERM = { x: 430, y: MID };            // axon terminal centre
+  const PRE_TERM = { x: 430, y: MID };            // axon terminal centre (legs emanate from here)
 
-  const POST    = { sx: 710, sy: MID, r: 28 };  // postsynaptic soma
-  const CLEFT_X = PRE_TERM.x + BOUTON_R + 4;     // left edge of synaptic cleft
+  const POST    = { sx: 740, sy: MID, r: 36 };  // postsynaptic soma (dendrites touch cleft edge)
+  const CLEFT_LEFT  = 472;                         // cleft starts after terminal legs
+  const CLEFT_RIGHT = 550;                         // cleft ends; dendrites touch this edge
 
-  // Axon extents (pre: soma→terminal, post: soma→right edge)
+  // Axon extents (pre: soma→terminal)
   const axonX1      = PRE.sx + PRE.r;
-  const axonX2      = PRE_TERM.x - BOUTON_R + 2;  // touches terminal
+  const axonX2      = PRE_TERM.x;                 // axon extends to terminal centre
   const postAxonX1  = POST.sx + POST.r;
 
   // Pre-compute myelin sheath positions along each axon
   const preMyelin      = myelinPts(axonX1, MID, axonX2,  MID, 25);
-  const postAxonMyelin = myelinPts(postAxonX1, MID, W + 2, MID, 22);
+  const postAxonMyelin = myelinPts(postAxonX1, MID, W + 2, MID, 22, true);
 
   // ── Dendrite trees (deterministic fractal lines) ──
   const preDend = buildTree(PRE.sx, PRE.sy, [
@@ -51,25 +51,26 @@
   ], 42);
 
   const postDend = buildTree(POST.sx, POST.sy, [
-    { a:  Math.PI,       l: 82, d: 4, lw: 2.2 }, // long branch toward cleft
-    { a:  Math.PI * .82, l: 70, d: 4, lw: 2.1 },
-    { a: -Math.PI * .82, l: 68, d: 4, lw: 2.1 },
-    { a:  Math.PI * .62, l: 58, d: 3, lw: 2.0 },
-    { a: -Math.PI * .62, l: 55, d: 3, lw: 2.0 },
-    { a:  Math.PI * .44, l: 48, d: 3, lw: 1.9 },
+    { a:  Math.PI,       l: 82, d: 4, lw: 2.5 }, // long branch toward cleft (touches edge)
+    { a:  Math.PI * .82, l: 70, d: 4, lw: 2.4 },
+    { a: -Math.PI * .82, l: 68, d: 4, lw: 2.4 },
+    { a:  Math.PI * .62, l: 58, d: 3, lw: 2.2 },
+    { a: -Math.PI * .62, l: 55, d: 3, lw: 2.2 },
+    { a:  Math.PI * .44, l: 48, d: 3, lw: 2.0 },
   ], 77);
 
   // ── Hover-tooltip regions ─────────────────────────
   let hovPart = null, mx = 0, my = 0;
 
   const INTRO_PARTS = {
-    preSoma:  { label: 'Presynaptic Neuron (Soma)',       x: 155, y: MID, rx: 35, ry: 35 },
-    preAxon:  { label: 'Myelinated Axon',                 x: 290, y: MID, rx: 80, ry: 14 },
-    preTerm:  { label: 'Axon Terminal (Bouton)',           x: 430, y: MID, rx: 28, ry: 28 },
-    cleft:    { label: 'Synaptic Cleft',                  x: 462, y: MID, rx: 14, ry: 30 },
-    postDend: { label: 'Postsynaptic Dendrites',          x: 560, y: MID, rx: 70, ry: 40 },
-    postSoma: { label: 'Postsynaptic Neuron (Soma)',      x: 710, y: MID, rx: 35, ry: 35 },
-    postAxon: { label: 'Postsynaptic Axon (myelinated)', x: 810, y: MID, rx: 70, ry: 14 },
+    preSoma:  { label: 'Presynaptic Soma (Cell Body)',    x: 155, y: MID, rx: 35, ry: 35 },
+    preDend:  { label: 'Presynaptic Dendrites',           x: 95,  y: MID, rx: 50, ry: 140 },
+    preAxon:  { label: 'Presynaptic Axon (myelinated)',   x: 290, y: MID, rx: 80, ry: 14 },
+    preTerm:  { label: 'Presynaptic Axon Terminal',      x: 430, y: MID, rx: 25, ry: 50 },
+    cleft:    { label: 'Synaptic Cleft',                  x: (CLEFT_LEFT + CLEFT_RIGHT) / 2, y: MID, rx: (CLEFT_RIGHT - CLEFT_LEFT) / 2 + 10, ry: 180 },
+    postDend: { label: 'Postsynaptic Dendrites',          x: 600, y: MID, rx: 85, ry: 50 },
+    postSoma: { label: 'Postsynaptic Soma (Cell Body)',   x: 740, y: MID, rx: 42, ry: 42 },
+    postAxon: { label: 'Postsynaptic Axon (myelinated)', x: 855, y: MID, rx: 50, ry: 14 },
   };
 
   nc.addEventListener('mousemove', e => {
@@ -132,8 +133,9 @@
   /**
    * Compute evenly-spaced myelin sheath positions along a line segment.
    * Returns array of { x, y, ang } objects used by drawMyelinTube().
+   * @param {boolean} addEndPoint - if true, add one more point near the end (touches edge)
    */
-  function myelinPts(x1, y1, x2, y2, spacing) {
+  function myelinPts(x1, y1, x2, y2, spacing, addEndPoint = false) {
     const dx  = x2 - x1, dy = y2 - y1;
     const L   = Math.sqrt(dx * dx + dy * dy) || 1;
     const ux  = dx / L, uy = dy / L;
@@ -141,6 +143,9 @@
     const pts = [];
     for (let d = 22; d < L - 18; d += spacing) {
       pts.push({ x: x1 + ux * d, y: y1 + uy * d, ang });
+    }
+    if (addEndPoint) {
+      pts.push({ x: x1 + ux * (L - 12), y: y1 + uy * (L - 12), ang });
     }
     return pts;
   }
@@ -204,14 +209,10 @@
     }
   }
 
-  /** Draw the blue branching axon terminal (bouton) */
-  function drawBouton(x, y) {
-    // Filled circle base
-    c.beginPath(); c.arc(x, y, BOUTON_R, 0, Math.PI * 2);
-    c.fillStyle = 'rgba(40,104,200,.38)'; c.strokeStyle = '#2060b0'; c.lineWidth = 2.2;
-    c.fill(); c.stroke();
-
-    // Fan of branch lines from the terminal centre
+  /** Draw axon terminal as blue legs/sticks (no bulb) */
+  function drawBouton() {
+    const x = PRE_TERM.x, y = PRE_TERM.y;
+    // Branch lines (legs/sticks) emanating from terminal point
     const branchAngles = [-.6, -.3, 0, .3, .6];
     for (const ba of branchAngles) {
       const len = 34 + Math.abs(ba) * 10;
@@ -225,10 +226,6 @@
         c.strokeStyle = '#4888d8'; c.lineWidth = 1.8; c.stroke();
       }
     }
-
-    // Junction dot
-    c.beginPath(); c.arc(x, y, 4, 0, Math.PI * 2);
-    c.fillStyle = '#2868c8'; c.fill();
   }
 
 
@@ -246,7 +243,7 @@
     if (apT > .87 && apT < .94 && tick % 4 === 0) {
       for (let i = 0; i < 3; i++) {
         dots.push({
-          x:  PRE_TERM.x + BOUTON_R + 4 + (Math.random() - .5) * 6,
+          x:  CLEFT_LEFT + 4 + (Math.random() - .5) * 8,
           y:  PRE_TERM.y + (Math.random() - .5) * 5,
           vx: .7 + Math.random() * .4,
           vy: (Math.random() - .5) * .4,
@@ -275,12 +272,15 @@
     }
 
     drawSoma(PRE.sx, PRE.sy, PRE.r, '#b080e0', '#4820a0');
-    drawBouton(PRE_TERM.x, PRE_TERM.y);
+    drawBouton();
 
-    // Synaptic cleft dashed divider
-    c.setLineDash([3, 4]);
-    c.strokeStyle = 'rgba(190,160,235,.45)'; c.lineWidth = 1.2;
-    c.beginPath(); c.moveTo(CLEFT_X, MID - 28); c.lineTo(CLEFT_X, MID + 28); c.stroke();
+    // Synaptic cleft band (from terminal edge to post dendrites, full height)
+    c.fillStyle = 'rgba(180,100,255,.08)';
+    c.fillRect(CLEFT_LEFT, 0, CLEFT_RIGHT - CLEFT_LEFT, H);
+    c.setLineDash([4, 6]);
+    c.strokeStyle = 'rgba(170,90,240,.4)'; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(CLEFT_LEFT, 0); c.lineTo(CLEFT_LEFT, H); c.stroke();
+    c.beginPath(); c.moveTo(CLEFT_RIGHT, 0); c.lineTo(CLEFT_RIGHT, H); c.stroke();
     c.setLineDash([]);
 
     // ── Draw postsynaptic neuron ──
@@ -288,12 +288,12 @@
     drawMyelinTube(postAxonX1, MID, W + 4, MID, postAxonMyelin, 3.5);
     drawSoma(POST.sx, POST.sy, POST.r, '#a068d0', '#381898');
 
-    // Glutamate dots drifting into cleft
+    // Glutamate dots drifting into cleft (red to match interactive demo)
     for (const d of dots) {
       const al = Math.min(1, d.life / 32);
       c.beginPath(); c.arc(d.x, d.y, 3.2, 0, Math.PI * 2);
-      c.fillStyle  = `rgba(138,63,176,${al * .9})`;
-      c.shadowBlur = 7; c.shadowColor = 'rgba(138,63,176,.5)';
+      c.fillStyle  = `rgba(255,0,0,${al * .9})`;
+      c.shadowBlur = 7; c.shadowColor = 'rgba(255,80,80,.5)';
       c.fill(); c.shadowBlur = 0;
     }
 
@@ -308,30 +308,19 @@
   // ── Labels ────────────────────────────────────────
 
   function drawOverviewLabels() {
-    // Neuron names; larger, prominent
+    // Neuron names
     c.font = '700 13px Nunito,sans-serif';
     c.fillStyle = 'rgba(172,142,228,.92)';
-    c.textAlign = 'left';  c.fillText('Presynaptic neuron', 6, 18);
-    c.textAlign = 'center'; c.fillText('Postsynaptic neuron', POST.sx + 50, 18);
-
-    // Sub-labels
-    c.font = '500 8.5px Nunito Sans,sans-serif';
-    c.fillStyle = 'rgba(145,115,208,.62)';
-    c.textAlign = 'center';
-    c.fillText('myelinated axon', (axonX1 + axonX2) / 2, MID - 18);
-    c.fillText('axon terminal',   PRE_TERM.x, PRE_TERM.y - BOUTON_R - 10);
-    c.fillText('axon →',          (postAxonX1 + (W - 8)) / 2, POST.sy - 16);
     c.textAlign = 'left';
+    c.fillText('Presynaptic neuron', 24, 18);
+    c.textAlign = 'center';
+    c.fillText('Postsynaptic neuron', POST.sx + 65, 18);
 
-    // Vertical "Synaptic Cleft" label
+    // Synaptic Cleft label (horizontal)
     c.font = '700 9px Nunito,sans-serif';
     c.fillStyle = 'rgba(130,90,190,.85)';
-    c.save();
-    c.translate(CLEFT_X + 10, MID);
-    c.rotate(-Math.PI / 2);
     c.textAlign = 'center';
-    c.fillText('Synaptic Cleft', 0, 0);
-    c.restore();
+    c.fillText('Synaptic Cleft', (CLEFT_LEFT + CLEFT_RIGHT) / 2, MID);
   }
 
   /**
@@ -339,25 +328,15 @@
    * axon terminal → synaptic cleft → postsynaptic dendrites
    */
   function drawTransmissionHighlight() {
-    // 1. Blue glow around axon terminal
-    const hlGrad = c.createLinearGradient(PRE_TERM.x - BOUTON_R - 5, 0, CLEFT_X + 30, 0);
+    // 1. Subtle glow around axon terminal legs
+    const hlGrad = c.createLinearGradient(PRE_TERM.x - 30, 0, CLEFT_LEFT + 30, 0);
     hlGrad.addColorStop(0, 'rgba(80,160,255,0)');
-    hlGrad.addColorStop(.3, 'rgba(80,160,255,.18)');
-    hlGrad.addColorStop(.7, 'rgba(80,160,255,.18)');
+    hlGrad.addColorStop(.5, 'rgba(80,160,255,.1)');
     hlGrad.addColorStop(1, 'rgba(80,160,255,0)');
     c.fillStyle = hlGrad;
-    c.beginPath();
-    c.roundRect(PRE_TERM.x - BOUTON_R - 2, MID - BOUTON_R - 2, BOUTON_R * 2 + 4, BOUTON_R * 2 + 4, 8);
-    c.fill();
-    c.beginPath(); c.arc(PRE_TERM.x, PRE_TERM.y, BOUTON_R + 5, 0, Math.PI * 2);
-    c.strokeStyle = 'rgba(50,140,255,.35)'; c.lineWidth = 2.5; c.stroke();
+    c.fillRect(PRE_TERM.x - 25, MID - 50, 75, 100);
 
-    // 2. Purple band across the synaptic cleft
-    c.fillStyle = 'rgba(180,100,255,.12)';
-    c.fillRect(CLEFT_X - 1, MID - 28, 14, 56);
-    c.strokeStyle = 'rgba(170,90,240,.45)'; c.lineWidth = 1.5;
-    c.beginPath(); c.moveTo(CLEFT_X, MID - 28);     c.lineTo(CLEFT_X, MID + 28);     c.stroke();
-    c.beginPath(); c.moveTo(CLEFT_X + 13, MID - 28); c.lineTo(CLEFT_X + 13, MID + 28); c.stroke();
+    // 2. Cleft already drawn as full-height band in main loop
 
     // 3. Radial glow over postsynaptic dendrites
     const dendHL = c.createRadialGradient(POST.sx - 60, MID, 5, POST.sx - 60, MID, 80);
