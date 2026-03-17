@@ -226,14 +226,23 @@ function initSynapse() {
     particles.length = 0;
     arrows.length    = 0;
 
-    // Reset vesicles
+    // Reset vesicles; docked ones return to fusion site
     for (const v of VESICLES) {
       v.fusing      = false;
       v.released    = false;
-      v.stuckAtMembrane = false;
       v.fuseProgress = 0;
-      v.cx = v.origCx;
-      v.cy = v.origCy;
+      if (v.docked) {
+        v.stuckAtMembrane = true;
+        const cx = COLS[v.col].cx;
+        const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
+        const t = FUSE_TARGETS[fuseIdx];
+        v.cx = cx + t.dx;
+        v.cy = PRE_BOT + t.dy;
+      } else {
+        v.stuckAtMembrane = false;
+        v.cx = v.origCx;
+        v.cy = v.origCy;
+      }
     }
 
     setStepUI(0);  // Step 1: vesicles docked & primed
