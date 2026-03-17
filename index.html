@@ -66,23 +66,15 @@
       <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
         <canvas id="syn-canvas" width="840" height="680"></canvas>
 
-        <!-- Legend (below canvas, under presynaptic area) -->
+        <!-- Legend (below canvas) -->
         <div class="pcard legend-below">
           <div class="leg-hdr">Legend</div>
-          <div class="leg-section">Ions</div>
-          <div class="leg-row"><div class="ldot" style="background:#3a9fc8"></div>Ca²⁺</div>
-          <div class="leg-row"><div class="ldot" style="background:#4fa8e8"></div>Na⁺</div>
-          <div class="leg-row"><div class="ldot" style="background:#64b464"></div>K⁺</div>
-          <div class="leg-row"><div class="ldot" style="background:#a0a0af"></div>Mg²⁺</div>
-          <div class="leg-row"><div class="ldot" style="background:#8a3fb0;border:2px solid #6a1f90"></div>Glutamate</div>
-          <div class="leg-section">Structures</div>
-          <div class="leg-row"><div class="ldot" style="background:#8a3fb0;border:2px solid #6a1f90"></div>Synaptic vesicle</div>
-          <div class="leg-row"><div class="ldot" style="background:#3a9fc8"></div>Ca²⁺ entering terminal</div>
-          <div class="leg-row"><div class="ldot" style="background:#4fa8e8"></div>Na⁺ through AMPA</div>
-          <div class="leg-row"><div class="ldot" style="background:#e07050"></div>Ca²⁺ through NMDA</div>
-          <div class="leg-row"><div class="lrect" style="background:#6890d0"></div>AMPA receptor</div>
-          <div class="leg-row"><div class="lrect" style="background:#9060c0"></div>NMDA receptor</div>
-          <div class="leg-row"><div class="lrect" style="background:#e0c030;border-radius:50%;width:9px;height:9px"></div>CaMKII</div>
+          <div class="leg-row"><div class="ldot" style="background:#FFEB3B"></div>Action potential</div>
+          <div class="leg-row"><div class="ldot" style="background:#FF8C00"></div>Ca²⁺ (calcium)</div>
+          <div class="leg-row"><div class="ldot" style="background:#9E9E9E"></div>Na⁺ (sodium)</div>
+          <div class="leg-row"><div class="ldot" style="background:#FF69B4"></div>K⁺ (potassium)</div>
+          <div class="leg-row"><div class="ldot" style="background:#4B0082"></div>Mg²⁺ (magnesium)</div>
+          <div class="leg-row"><div class="ldot" style="background:#FF0000"></div>Glutamate</div>
         </div>
 
         <!-- Step detail popup (shown below canvas when a phase is active) -->
@@ -146,7 +138,7 @@
             <button class="btn-next" id="btn-next" disabled>Next →</button>
           </div>
           <div class="auto-row">
-            <input type="checkbox" id="cb-auto">
+            <input type="checkbox" id="cb-auto" checked>
             <label for="cb-auto">Autoplay steps</label>
           </div>
           <div class="speed-row">

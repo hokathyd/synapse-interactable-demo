@@ -32,15 +32,41 @@ const COLS = [{ cx: 270 }, { cx: 570 }];
 const BOX_W       = TERM_R * 2;   // = 240
 const BOX_SPINE_W = BOX_W;
 
-// AMPA receptor x-offsets relative to each column centre
-// Spread wide enough that they don't touch NMDA (which sits at -20)
-const AMPA_DX = [-85, 45];  // two AMPA receptors, well separated from NMDA
+// AMPA receptor x-offsets relative to each column centre (centered in spine)
+const AMPA_DX = [-65, 65];  // two AMPA receptors, symmetric around center
 
 // NMDA receptor x-offset; centred between the two AMPA receptors
-const NMDA_DX = [-20];      // sits between -85 and +45
+const NMDA_DX = [0];       // center of spine
 
 // CaMKII positions (y) inside each spine, two per spine
 const CAMKII_DY = [POST_T + 140, POST_T + 168];
+
+// Ion/molecule colors (hex); use consistently across diagram, particles, arrows
+const ION_COLORS = {
+  ca:  '#FF8C00',  // Ca²⁺ orange
+  na:  '#9E9E9E',  // Na⁺ grey
+  k:   '#FF69B4',  // K⁺ pink
+  mg:  '#4B0082',  // Mg²⁺ indigo
+  glu: '#FF0000',  // Glutamate red
+  ap:  '#FFEB3B',  // Action potential yellow
+};
+// Receptor / channel structure colors (blue/purple reserved for axon terminal & dendrite)
+const RECEPTOR_COLORS = {
+  vgcc:  '#FF8C00',  // VGCC; warm orange (Ca²⁺ association)
+  ampa:  '#69f0ae',  // AMPA; bright mint green
+  nmda:  '#26a69a',  // NMDA; teal (distinct from AMPA)
+  psd95: '#94a3b8',  // PSD-95 scaffold; slate gray
+  camkii:'#e07a5f',  // CaMKII; coral (distinct from AP yellow)
+};
+// rgba(alpha) helpers for translucent fills
+const ION_RGBA = {
+  ca:  a => `rgba(255,140,0,${a})`,
+  na:  a => `rgba(158,158,158,${a})`,
+  k:   a => `rgba(255,105,180,${a})`,
+  mg:  a => `rgba(75,0,130,${a})`,
+  glu: a => `rgba(255,0,0,${a})`,
+  ap:  a => `rgba(255,235,59,${a})`,
+};
 
 
 // ── Part descriptions (hover/click info panel) ────────────────

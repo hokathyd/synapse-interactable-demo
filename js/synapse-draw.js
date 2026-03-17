@@ -17,18 +17,18 @@ let sel = null, selId = null;   // currently selected (clicked) key + id
 let tick = 0;
 
 
-// ── Colour palette ────────────────────────────────────────────
+// ── Colour palette (blue/purple reserved for axon terminal & dendrite) ───
 // Presynaptic (axon + terminal): blues
-const PRE_FILL   = 'rgba(190,218,252,.65)';
-const PRE_FILL_H = 'rgba(160,200,248,.82)';
-const PRE_STR    = '#5888c8';
-const PRE_STR_H  = '#2860a8';
+const PRE_FILL   = 'rgba(80,120,200,.55)';
+const PRE_FILL_H = 'rgba(100,140,220,.75)';
+const PRE_STR    = '#6088d8';
+const PRE_STR_H  = '#80a8f0';
 
 // Postsynaptic (spine + shaft): purples
-const POST_FILL   = 'rgba(218,210,252,.65)';
-const POST_FILL_H = 'rgba(195,180,252,.82)';
-const POST_STR    = '#8858c8';
-const POST_STR_H  = '#5828a8';
+const POST_FILL   = 'rgba(120,80,180,.55)';
+const POST_FILL_H = 'rgba(140,100,200,.75)';
+const POST_STR    = '#8060c8';
+const POST_STR_H  = '#a080e8';
 
 
 // ── Utility ───────────────────────────────────────────────────
@@ -79,15 +79,15 @@ function drawArrow(ctx, ar) {
  * axon column rectangles + semicircular terminal bulge, VGCCs, vesicles.
  */
 function drawPresynaptic(ctx, phase, VESICLES) {
-  // Background tint for the presynaptic zone
-  ctx.fillStyle = 'rgba(210,228,252,.28)';
+  // Background tint for the presynaptic zone (blue for axon terminal)
+  ctx.fillStyle = 'rgba(60,100,180,.18)';
   ctx.fillRect(0, 0, ctx.canvas.width, PRE_BOT);
 
   for (let ci = 0; ci < 2; ci++) {
     const cx  = COLS[ci].cx;
     const isH = hov === 'terminal' && hovId === ci;
     const isS = sel === 'terminal' && selId === ci;
-    if (isH || isS) { ctx.shadowBlur = 18; ctx.shadowColor = 'rgba(80,130,220,.45)'; }
+    if (isH || isS) { ctx.shadowBlur = 18; ctx.shadowColor = 'rgba(100,140,220,.5)'; }
 
     // Merged axon + semicircular terminal as one path
     ctx.beginPath();
@@ -106,9 +106,9 @@ function drawPresynaptic(ctx, phase, VESICLES) {
     reg('terminal', cx, PRE_TOP / 2, TERM_R, PRE_TOP / 2 + TERM_R * .5, ci);
   }
 
-  // "PRESYNAPTIC" region label; left side, below terminal labels
+  // "PRESYNAPTIC" region label; left side (light text on dark bg)
   ctx.font = '700 11px Nunito,sans-serif';
-  ctx.fillStyle = 'rgba(30,70,160,.55)';
+  ctx.fillStyle = 'rgba(160,180,240,.9)';
   ctx.textAlign = 'left';
   ctx.fillText('PRESYNAPTIC', 8, 36);
 
@@ -125,8 +125,8 @@ function drawVGCCs(ctx, phase) {
 
   for (let ci = 0; ci < 2; ci++) {
     const cx = COLS[ci].cx;
-    // Two VGCC positions on the arc of each terminal
-    const vgccAngles = [Math.PI * .62, Math.PI * .38];
+    // Two VGCC positions on the arc, symmetric around center (π/2)
+    const vgccAngles = [Math.PI * .45, Math.PI * .55];
 
     for (let vi = 0; vi < 2; vi++) {
       const ang = vgccAngles[vi];
@@ -136,9 +136,9 @@ function drawVGCCs(ctx, phase) {
 
       const isH = hov === 'vgcc' && hovId === ci * 10 + vi;
       const isS = sel === 'vgcc' && selId === ci * 10 + vi;
-      if (isH || isS) glowAt(ctx, vx, vy, 30, 'rgba(58,159,200,.42)');
+      if (isH || isS) glowAt(ctx, vx, vy, 30, ION_RGBA.ca(.42));
 
-      // Draw dome pointing inward (toward terminal centre)
+      // Draw dome pointing inward (VGCC; orange shade)
       ctx.save();
       ctx.translate(vx, vy);
       ctx.rotate(ang + Math.PI / 2 + Math.PI); // orient dome inward
@@ -147,8 +147,8 @@ function drawVGCCs(ctx, phase) {
       ctx.moveTo(-vr, 0);
       ctx.arc(0, 0, vr, Math.PI, 0, false);
       ctx.closePath();
-      ctx.fillStyle   = vgccOpen ? 'rgba(58,159,200,.72)' : 'rgba(100,160,200,.3)';
-      ctx.strokeStyle = isH || isS ? '#1070b0' : (vgccOpen ? '#2888c0' : 'rgba(80,130,180,.55)');
+      ctx.fillStyle   = vgccOpen ? ION_RGBA.ca(.72) : 'rgba(255,140,0,.28)';
+      ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.vgcc : (vgccOpen ? RECEPTOR_COLORS.vgcc : 'rgba(255,140,0,.5)');
       ctx.lineWidth   = isH || isS ? 2.8 : 1.8;
       ctx.fill(); ctx.stroke();
 
@@ -177,7 +177,7 @@ function drawVesicles(ctx, VESICLES) {
     if (v.fusing) {
       v.fuseProgress = Math.min(1, (v.fuseProgress || 0) + 0.025);
       const fp  = v.fuseProgress;
-      const ang = v.cx < COLS[v.col].cx ? (Math.PI * .62) : (Math.PI * .38);
+        const ang = v.cx < COLS[v.col].cx ? (Math.PI * .55) : (Math.PI * .45);
       const tx  = COLS[v.col].cx + Math.cos(ang) * TERM_R * (1 - fp * 0.3);
       const ty  = PRE_TOP + Math.sin(ang) * TERM_R * (1 - fp * 0.3);
       v.cx = v.origCx + (tx - v.origCx) * fp;
@@ -187,12 +187,12 @@ function drawVesicles(ctx, VESICLES) {
 
     const isH = hov === 'vesicle' && hovId === v.id;
     const isS = sel === 'vesicle' && selId === v.id;
-    if (isH || isS) glowAt(ctx, v.cx, v.cy, v.r + 8, 'rgba(138,63,176,.3)');
+    if (isH || isS) glowAt(ctx, v.cx, v.cy, v.r + 8, ION_RGBA.glu(.3));
 
-    // Vesicle circle
+    // Vesicle circle (glutamate-colored)
     ctx.beginPath(); ctx.arc(v.cx, v.cy, v.r, 0, Math.PI * 2);
-    ctx.fillStyle   = isH || isS ? 'rgba(155,75,225,.48)' : 'rgba(155,80,215,.28)';
-    ctx.strokeStyle = isH || isS ? '#6010a0' : '#8a3fb0';
+    ctx.fillStyle   = isH || isS ? ION_RGBA.glu(.48) : ION_RGBA.glu(.28);
+    ctx.strokeStyle = isH || isS ? '#cc3300' : ION_COLORS.glu;
     ctx.lineWidth   = isH || isS ? 2.8 : 2.2;
     ctx.fill(); ctx.stroke();
 
@@ -201,7 +201,7 @@ function drawVesicles(ctx, VESICLES) {
       const da = (di / 3) * Math.PI * 2 - Math.PI / 2;
       ctx.beginPath();
       ctx.arc(v.cx + Math.cos(da) * v.r * .44, v.cy + Math.sin(da) * v.r * .44, 2.8, 0, Math.PI * 2);
-      ctx.fillStyle = isH || isS ? '#5010a0' : '#8030c0';
+      ctx.fillStyle = ION_COLORS.glu;
       ctx.fill();
     }
 
@@ -215,12 +215,12 @@ function drawVesicles(ctx, VESICLES) {
 function drawCleft(ctx, particles) {
   const W = ctx.canvas.width;
 
-  // Cleft background
-  ctx.fillStyle = 'rgba(235,228,255,.92)';
+  // Cleft background (black like reference)
+  ctx.fillStyle = '#08090f';
   ctx.fillRect(0, CLEFT_T, W, CLEFT_H);
 
-  // Border lines
-  ctx.strokeStyle = 'rgba(110,80,180,.35)'; ctx.lineWidth = 1.5;
+  // Border lines (neutral, not blue/purple)
+  ctx.strokeStyle = 'rgba(255,255,255,.12)'; ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.moveTo(0, CLEFT_T); ctx.lineTo(W, CLEFT_T); ctx.stroke();
   ctx.beginPath(); ctx.moveTo(0, POST_T);  ctx.lineTo(W, POST_T);  ctx.stroke();
 
@@ -236,13 +236,13 @@ function drawCleft(ctx, particles) {
 function drawStaticIons(ctx, particles, W) {
   const animating = particles.some(p => ['glu','ca','na','ca2'].includes(p.type));
 
-  // ── Cleft ions ──
+  // ── Cleft ions (no labels) ──
   const cleftIons = [
-    { lbl: 'Ca²⁺', col: 'rgba(58,159,200,.75)',  x: W * .15, y: CLEFT_T + CLEFT_H * .38 },
-    { lbl: 'Na⁺',  col: 'rgba(79,168,232,.75)',  x: W * .30, y: CLEFT_T + CLEFT_H * .62 },
-    { lbl: 'K⁺',   col: 'rgba(100,180,100,.75)', x: W * .50, y: CLEFT_T + CLEFT_H * .38 },
-    { lbl: 'Mg²⁺', col: 'rgba(160,160,175,.85)', x: W * .68, y: CLEFT_T + CLEFT_H * .62 },
-    { lbl: 'Glu',  col: 'rgba(138,63,176,.60)',  x: W * .84, y: CLEFT_T + CLEFT_H * .38 },
+    { col: ION_RGBA.ca(.75),  x: W * .15, y: CLEFT_T + CLEFT_H * .38 },
+    { col: ION_RGBA.na(.75),  x: W * .30, y: CLEFT_T + CLEFT_H * .62 },
+    { col: ION_RGBA.k(.75),   x: W * .50, y: CLEFT_T + CLEFT_H * .38 },
+    { col: ION_RGBA.mg(.85),  x: W * .68, y: CLEFT_T + CLEFT_H * .62 },
+    { col: ION_RGBA.glu(.6),  x: W * .84, y: CLEFT_T + CLEFT_H * .38 },
   ];
   if (!animating) {
     drawIonGroup(ctx, cleftIons);
@@ -253,10 +253,10 @@ function drawStaticIons(ctx, particles, W) {
     for (let ci = 0; ci < 2; ci++) {
       const cx = COLS[ci].cx;
       const preIons = [
-        { lbl: 'Ca²⁺', col: 'rgba(58,159,200,.28)', x: cx - 40, y: PRE_TOP + 45 },
-        { lbl: 'Ca²⁺', col: 'rgba(58,159,200,.28)', x: cx + 30, y: PRE_TOP + 60 },
-        { lbl: 'Ca²⁺', col: 'rgba(58,159,200,.28)', x: cx - 15, y: PRE_TOP + 85 },
-        { lbl: 'Ca²⁺', col: 'rgba(58,159,200,.28)', x: cx + 50, y: PRE_TOP + 75 },
+        { col: ION_RGBA.ca(.28), x: cx - 40, y: PRE_TOP + 45 },
+        { col: ION_RGBA.ca(.28), x: cx + 30, y: PRE_TOP + 60 },
+        { col: ION_RGBA.ca(.28), x: cx - 15, y: PRE_TOP + 85 },
+        { col: ION_RGBA.ca(.28), x: cx + 50, y: PRE_TOP + 75 },
       ];
       drawIonGroup(ctx, preIons);
     }
@@ -264,43 +264,21 @@ function drawStaticIons(ctx, particles, W) {
 
   // ── Postsynaptic Na⁺ / K⁺ ──
   const postIons = [
-    { lbl: 'Na⁺', col: 'rgba(79,168,232,.30)',  x: W * .22, y: POST_T + 90 },
-    { lbl: 'K⁺',  col: 'rgba(100,180,100,.30)', x: W * .38, y: POST_T + 110 },
-    { lbl: 'Na⁺', col: 'rgba(79,168,232,.30)',  x: W * .62, y: POST_T + 90 },
-    { lbl: 'K⁺',  col: 'rgba(100,180,100,.30)', x: W * .78, y: POST_T + 115 },
+    { col: ION_RGBA.na(.3), x: W * .22, y: POST_T + 90 },
+    { col: ION_RGBA.k(.3),  x: W * .38, y: POST_T + 110 },
+    { col: ION_RGBA.na(.3), x: W * .62, y: POST_T + 90 },
+    { col: ION_RGBA.k(.3),  x: W * .78, y: POST_T + 115 },
   ];
   drawIonGroup(ctx, postIons);
 }
 
-/**
- * Draw a group of ion dots, labelling each one ONLY if no same-label dot
- * has been drawn within MIN_LABEL_DIST pixels (avoids crowded labels).
- */
+/** Draw a group of ion dots (no labels). */
 function drawIonGroup(ctx, ions) {
-  const MIN_LABEL_DIST = 55; // px; minimum distance between same-type labels
-  const labelled = {}; // label → [{x,y}]
-
   for (const ion of ions) {
-    // Always draw the dot
     ctx.beginPath(); ctx.arc(ion.x, ion.y, 4.5, 0, Math.PI * 2);
     ctx.fillStyle = ion.col;
     ctx.shadowBlur = 5; ctx.shadowColor = ion.col;
     ctx.fill(); ctx.shadowBlur = 0;
-
-    // Only show label if far enough from existing labels of the same type
-    const prev = labelled[ion.lbl] || [];
-    const tooClose = prev.some(p => {
-      const dx = p.x - ion.x, dy = p.y - ion.y;
-      return Math.sqrt(dx * dx + dy * dy) < MIN_LABEL_DIST;
-    });
-
-    if (!tooClose) {
-      ctx.font = '600 8px Nunito,sans-serif';
-      ctx.fillStyle = ion.col;
-      ctx.textAlign = 'center';
-      ctx.fillText(ion.lbl, ion.x, ion.y - 8);
-      labelled[ion.lbl] = [...prev, { x: ion.x, y: ion.y }];
-    }
   }
 }
 
@@ -323,13 +301,13 @@ function drawPostsynaptic(ctx, phase) {
     reg('dendrite', W / 2, POST_BOT + (H - POST_BOT) / 2, W * .46, (H - POST_BOT) / 2);
   }
 
-  // Spine background
-  ctx.fillStyle = 'rgba(220,212,252,.38)';
+  // Spine background (dark-mode)
+  ctx.fillStyle = 'rgba(80,50,120,.25)';
   ctx.fillRect(0, POST_T, W, POST_BOT - POST_T);
 
-  // "POSTSYNAPTIC" label; bottom left
+  // "POSTSYNAPTIC" label; bottom left (light text on dark bg)
   ctx.font = '700 11px Nunito,sans-serif';
-  ctx.fillStyle = 'rgba(80,50,165,.52)';
+  ctx.fillStyle = 'rgba(180,160,220,.85)';
   ctx.textAlign = 'left';
   ctx.fillText('POSTSYNAPTIC', 8, H - 8);
 
@@ -350,7 +328,7 @@ function drawSpineBoxes(ctx) {
     const isH = hov === 'spine' && hovId === ci;
     const isS = sel === 'spine' && selId === ci;
 
-    if (isH || isS) { ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(110,65,210,.42)'; }
+    if (isH || isS) { ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(140,100,220,.5)'; }
 
     ctx.beginPath();
     ctx.moveTo(bx, by + bh);
@@ -373,16 +351,16 @@ function drawSpineBoxes(ctx) {
 function drawPSD95(ctx) {
   for (let ci = 0; ci < 2; ci++) {
     const cx  = COLS[ci].cx;
-    const psdY = POST_T + 6, psdH = 6;
+    const psdY = POST_T + 4, psdH = 14;
     const isH = hov === 'psd95' && hovId === ci;
     const isS = sel === 'psd95' && selId === ci;
     ctx.beginPath();
     ctx.rect(cx - BOX_SPINE_W / 2 + 8, psdY, BOX_SPINE_W - 16, psdH);
-    ctx.fillStyle   = isH || isS ? 'rgba(62,100,190,.45)' : 'rgba(62,100,190,.18)';
-    ctx.strokeStyle = isH || isS ? 'rgba(62,100,190,.8)'  : 'rgba(62,100,190,.32)';
+    ctx.fillStyle   = isH || isS ? 'rgba(148,163,184,.5)' : 'rgba(148,163,184,.25)';
+    ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.psd95 : 'rgba(148,163,184,.45)';
     ctx.lineWidth   = isH || isS ? 1.5 : 1;
     ctx.fill(); ctx.stroke();
-    reg('psd95', cx, psdY + psdH / 2, BOX_SPINE_W / 2 - 8, psdH, ci);
+    reg('psd95', cx, psdY + psdH / 2, BOX_SPINE_W / 2 - 8, psdH / 2, ci);
   }
 }
 
@@ -399,22 +377,22 @@ function drawAMPA(ctx, phase) {
       const ax = cx + AMPA_DX[ai], ay = POST_T;
       const isH = hov === 'ampa' && hovId === ci * 10 + ai;
       const isS = sel === 'ampa' && selId === ci * 10 + ai;
-      if (isH || isS) glowAt(ctx, ax, ay + 28, 42, 'rgba(80,140,220,.32)');
+      if (isH || isS) glowAt(ctx, ax, ay + 28, 42, 'rgba(105,240,174,.28)');
 
       const gap = ampaActive ? 14 : 5; // pore widens on activation
 
-      // Two subunit ellipses
+      // Two subunit ellipses (AMPA; mint green)
       for (const dx of [-gap / 2 - 14, gap / 2 + 2]) {
         ctx.beginPath(); ctx.ellipse(ax + dx + 6, ay + 28, 13, 30, 0, 0, Math.PI * 2);
-        ctx.fillStyle   = ampaActive ? 'rgba(70,130,220,.68)' : 'rgba(104,144,208,.35)';
-        ctx.strokeStyle = isH || isS ? '#2050cc' : (ampaActive ? '#4078d8' : 'rgba(90,120,185,.65)');
+        ctx.fillStyle   = ampaActive ? 'rgba(105,240,174,.55)' : 'rgba(105,240,174,.28)';
+        ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.ampa : (ampaActive ? RECEPTOR_COLORS.ampa : 'rgba(105,240,174,.6)');
         ctx.lineWidth   = isH || isS ? 2.8 : 1.8;
         ctx.fill(); ctx.stroke();
       }
 
       // Open-pore Na⁺ colour hint
       if (ampaActive) {
-        ctx.fillStyle = 'rgba(79,168,232,.30)';
+        ctx.fillStyle = ION_RGBA.na(.3);
         ctx.fillRect(ax - gap / 2 + 2, ay + 3, gap, 52);
       }
 
@@ -436,33 +414,31 @@ function drawNMDA(ctx, phase) {
     const nx = cx + NMDA_DX[0], ny = POST_T;
     const isH = hov === 'nmda' && hovId === ci * 10;
     const isS = sel === 'nmda' && selId === ci * 10;
-    if (isH || isS) glowAt(ctx, nx, ny + 30, 46, 'rgba(150,80,200,.32)');
+    if (isH || isS) glowAt(ctx, nx, ny + 30, 46, 'rgba(38,166,154,.28)');
 
     const gap2 = nmdaActive ? 14 : 4;
 
-    // Two subunit ellipses (taller than AMPA)
+    // Two subunit ellipses (NMDA; teal)
     for (const dx of [-gap2 / 2 - 14, gap2 / 2 + 2]) {
       ctx.beginPath(); ctx.ellipse(nx + dx + 6, ny + 30, 14, 34, 0, 0, Math.PI * 2);
-      ctx.fillStyle   = nmdaActive ? 'rgba(130,80,200,.68)' : 'rgba(144,96,192,.28)';
-      ctx.strokeStyle = isH || isS ? '#5020a8' : (nmdaActive ? '#7848b8' : 'rgba(120,80,170,.55)');
+      ctx.fillStyle   = nmdaActive ? 'rgba(38,166,154,.6)' : 'rgba(38,166,154,.25)';
+      ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.nmda : (nmdaActive ? RECEPTOR_COLORS.nmda : 'rgba(38,166,154,.55)');
       ctx.lineWidth   = isH || isS ? 2.8 : 1.8;
       ctx.fill(); ctx.stroke();
     }
 
     if (!nmdaActive) {
-      // Mg²⁺ block; large grey rectangle in the pore
-      ctx.fillStyle = 'rgba(160,160,175,.95)';
+      // Mg²⁺ block in the pore
+      ctx.fillStyle = ION_RGBA.mg(.95);
       ctx.beginPath(); ctx.roundRect(nx - 11, ny + 14, 22, 26, 5); ctx.fill();
-      ctx.strokeStyle = 'rgba(120,120,140,.8)'; ctx.lineWidth = 1.5; ctx.stroke();
-      ctx.font = '700 10px Nunito,sans-serif'; ctx.fillStyle = '#333';
-      ctx.textAlign = 'center'; ctx.fillText('Mg²⁺', nx, ny + 30);
-      ctx.font = '600 8px Nunito,sans-serif'; ctx.fillStyle = 'rgba(180,30,30,.75)';
+      ctx.strokeStyle = 'rgba(38,166,154,.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.font = '600 8px Nunito,sans-serif'; ctx.fillStyle = 'rgba(255,200,200,.9)';
       ctx.textAlign = 'center'; ctx.fillText('BLOCKED', nx, ny + 10);
     } else {
       // Open pore; Ca²⁺ colour hint
-      ctx.fillStyle = 'rgba(224,112,80,.32)';
+      ctx.fillStyle = ION_RGBA.ca(.32);
       ctx.fillRect(nx - gap2 / 2 + 1, ny + 3, gap2, 54);
-      ctx.font = '600 8px Nunito,sans-serif'; ctx.fillStyle = 'rgba(180,80,20,.80)';
+      ctx.font = '600 8px Nunito,sans-serif'; ctx.fillStyle = 'rgba(255,220,180,.9)';
       ctx.textAlign = 'center'; ctx.fillText('OPEN', nx, ny + 10);
     }
 
@@ -485,9 +461,9 @@ function drawCaMKII(ctx, phase) {
       const pulse = ckOn ? .5 + .5 * Math.sin(tick * .09) : 0;
       const isH   = hov === 'camkii' && hovId === ci * 10 + ki;
       const isS   = sel === 'camkii' && selId === ci * 10 + ki;
-      if (isH || isS) glowAt(ctx, kx, ky, 18, 'rgba(200,160,50,.3)');
+      if (isH || isS) glowAt(ctx, kx, ky, 18, 'rgba(224,122,95,.25)');
 
-      // Hexagon
+      // Hexagon (CaMKII; coral)
       ctx.beginPath();
       for (let k = 0; k < 6; k++) {
         const a = (k / 6) * Math.PI * 2 - Math.PI / 6;
@@ -495,14 +471,14 @@ function drawCaMKII(ctx, phase) {
                 : ctx.lineTo(kx + Math.cos(a) * 13, ky + Math.sin(a) * 13);
       }
       ctx.closePath();
-      ctx.fillStyle   = ckOn ? `rgba(210,160,40,${.28 + pulse * .35})` : 'rgba(150,110,60,.1)';
-      ctx.strokeStyle = isH || isS ? '#a07010' : (ckOn ? `rgba(210,160,40,${.8 + pulse * .2})` : 'rgba(150,110,60,.28)');
+      ctx.fillStyle   = ckOn ? `rgba(224,122,95,${.3 + pulse * .35})` : 'rgba(148,163,184,.12)';
+      ctx.strokeStyle = isH || isS ? RECEPTOR_COLORS.camkii : (ckOn ? `rgba(224,122,95,${.75 + pulse * .2})` : 'rgba(148,163,184,.35)');
       ctx.lineWidth   = isH || isS ? 2.2 : 1.4;
       ctx.fill(); ctx.stroke();
 
       // Centre dot
       ctx.beginPath(); ctx.arc(kx, ky, 3, 0, Math.PI * 2);
-      ctx.fillStyle = ckOn ? 'rgba(220,170,40,.9)' : 'rgba(150,110,60,.3)';
+      ctx.fillStyle = ckOn ? 'rgba(224,122,95,.9)' : 'rgba(148,163,184,.35)';
       ctx.fill();
 
       reg('camkii', kx, ky, 16, 16, ci * 10 + ki);
@@ -510,17 +486,8 @@ function drawCaMKII(ctx, phase) {
   }
 }
 
-/**
- * Draw all live particles (Ca²⁺, Na⁺, Glu, AP glow).
- * Labels are shown on every other particle, only when sufficiently opaque,
- * and only if no same-type label was drawn within MIN_DIST pixels this frame.
- */
+/** Draw all live particles (Ca²⁺, Na⁺, Glu, AP); no labels. */
 function drawParticles(ctx, particles) {
-  const MIN_DIST  = 40; // px; minimum gap between particle labels of the same type
-  const labelled  = {}; // type → [{x,y}]; positions already labelled this frame
-
-  const ION_LABELS = { ca: 'Ca²⁺', glu: 'Glu', na: 'Na⁺', ca2: 'Ca²⁺' };
-
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.x += p.vx; p.y += p.vy; p.life--;
@@ -528,32 +495,15 @@ function drawParticles(ctx, particles) {
 
     const al = Math.min(1, p.life / 18);
     let fc, sc;
-    if      (p.type === 'ca')  { fc = `rgba(58,159,200,${al*.92})`;  sc = 'rgba(58,159,200,.6)'; }
-    else if (p.type === 'glu') { fc = `rgba(138,63,176,${al*.9})`;   sc = 'rgba(138,63,176,.55)'; }
-    else if (p.type === 'na')  { fc = `rgba(79,168,232,${al*.9})`;   sc = 'rgba(79,168,232,.55)'; }
-    else if (p.type === 'ca2') { fc = `rgba(224,112,80,${al*.92})`;  sc = 'rgba(224,112,80,.6)'; }
-    else                       { fc = `rgba(245,205,55,${al*.78})`;  sc = 'rgba(245,205,55,.88)'; } // ap
+    if      (p.type === 'ca')  { fc = ION_RGBA.ca(al * .92);  sc = ION_RGBA.ca(.6); }
+    else if (p.type === 'glu') { fc = ION_RGBA.glu(al * .9);  sc = ION_RGBA.glu(.55); }
+    else if (p.type === 'na')  { fc = ION_RGBA.na(al * .9);   sc = ION_RGBA.na(.55); }
+    else if (p.type === 'ca2') { fc = ION_RGBA.ca(al * .92); sc = ION_RGBA.ca(.6); }
+    else                       { fc = ION_RGBA.ap(al * .78); sc = ION_RGBA.ap(.88); } // ap
 
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
     ctx.fillStyle = fc; ctx.shadowBlur = 9; ctx.shadowColor = sc;
     ctx.fill(); ctx.shadowBlur = 0;
-
-    // Ion label; sparse: skip odd indices, dim particles, and nearby same-type labels
-    const lbl = ION_LABELS[p.type];
-    if (lbl && i % 2 === 0 && al > 0.45) {
-      const prev = labelled[p.type] || [];
-      const tooClose = prev.some(pt => {
-        const dx = pt.x - p.x, dy = pt.y - p.y;
-        return Math.sqrt(dx * dx + dy * dy) < MIN_DIST;
-      });
-      if (!tooClose) {
-        ctx.font = '600 7px Nunito,sans-serif';
-        ctx.fillStyle = fc;
-        ctx.textAlign = 'center';
-        ctx.fillText(lbl, p.x, p.y - p.r - 2);
-        labelled[p.type] = [...prev, { x: p.x, y: p.y }];
-      }
-    }
   }
 }
 
@@ -578,12 +528,12 @@ function drawSynapseTooltip(ctx) {
   if (tx + tw + pad * 2 > W) tx = synMx - tw - pad * 2 - 14;
   if (ty - th < 0) ty = synMy + 26;
 
-  ctx.fillStyle = 'rgba(20,8,50,.85)';
+  ctx.fillStyle = 'rgba(17,22,32,.92)';
   ctx.beginPath();
   ctx.roundRect(tx - 4, ty - th + 2, tw + pad * 2, th + 4, 6);
   ctx.fill();
-  ctx.strokeStyle = 'rgba(150,110,240,.7)'; ctx.lineWidth = 1.2; ctx.stroke();
-  ctx.fillStyle = '#e8d4ff';
+  ctx.strokeStyle = 'rgba(148,163,184,.5)'; ctx.lineWidth = 1.2; ctx.stroke();
+  ctx.fillStyle = '#c8d0e0';
   ctx.textAlign = 'left';
   ctx.fillText(lbl, tx + pad - 4, ty);
 }
@@ -607,8 +557,8 @@ function drawFrame(ctx, phase, particles, arrows, VESICLES) {
 
   hitRegions = []; // reset each frame
 
-  // Clear
-  ctx.fillStyle = '#faf8ff'; ctx.fillRect(0, 0, W, H);
+  // Clear (dark theme #0a0e14, matches reference)
+  ctx.fillStyle = '#0a0e14'; ctx.fillRect(0, 0, W, H);
 
   drawPresynaptic(ctx, phase, VESICLES);
   drawCleft(ctx, particles);

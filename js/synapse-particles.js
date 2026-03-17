@@ -56,7 +56,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
     case 'ap':
       for (const col of COLS) {
         spawnDir(particles, 'ap', col.cx, 0, col.cx, AXON_BOT, 8);
-        spawnArrow(arrows, col.cx, 4, col.cx, AXON_BOT - 4, '#f0c830', 110);
+        spawnArrow(arrows, col.cx, 4, col.cx, AXON_BOT - 4, ION_COLORS.ap, 110);
       }
       break;
 
@@ -65,12 +65,12 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
         for (let vi = 0; vi < 2; vi++) {
-          const ang = vi === 0 ? (Math.PI * .62) : (Math.PI * .38);
+          const ang = vi === 0 ? (Math.PI * .55) : (Math.PI * .45);
           const vx  = cx + Math.cos(ang) * TERM_R;
           const vy  = PRE_TOP + Math.sin(ang) * TERM_R;
           // Ca²⁺ flows inward through the VGCC
           spawnDir(particles, 'ca', vx, AXON_BOT + 25, vx, vy - 5, 12);
-          spawnArrow(arrows, vx, AXON_BOT + 20, vx, vy - 4, '#3a9fc8', 95);
+          spawnArrow(arrows, vx, AXON_BOT + 20, vx, vy - 4, ION_COLORS.ca, 95);
         }
       }
       break;
@@ -83,11 +83,11 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
         v.fuseProgress = 0;
         v.cx = v.origCx; v.cy = v.origCy; // reset for replay
 
-        const ang = v.cx < COLS[v.col].cx ? (Math.PI * .62) : (Math.PI * .38);
+        const ang = v.cx < COLS[v.col].cx ? (Math.PI * .55) : (Math.PI * .45);
         const vx  = COLS[v.col].cx + Math.cos(ang) * TERM_R;
         const vy  = PRE_TOP + Math.sin(ang) * TERM_R;
         spawnDir(particles, 'ca', vx, vy, v.cx, v.cy, 5);
-        spawnArrow(arrows, vx, vy, v.cx, v.cy, '#3a9fc8', 80);
+        spawnArrow(arrows, vx, vy, v.cx, v.cy, ION_COLORS.ca, 80);
       }
       break;
 
@@ -100,7 +100,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
         spawnDir(particles, 'glu', v.cx, v.cy, v.cx, CLEFT_T + CLEFT_H * .6, 12);
       }
       for (const col of COLS) {
-        spawnArrow(arrows, col.cx, PRE_BOT - 5, col.cx, POST_T + 8, '#8a3fb0', 95);
+        spawnArrow(arrows, col.cx, PRE_BOT - 5, col.cx, POST_T + 8, ION_COLORS.glu, 95);
       }
       break;
 
@@ -110,11 +110,11 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
         const cx = COLS[ci].cx;
         for (const dx of AMPA_DX) {
           spawnDir(particles, 'glu', cx + dx, CLEFT_T + 4, cx + dx, POST_T + 8, 7);
-          spawnArrow(arrows, cx + dx, CLEFT_T + 3, cx + dx, POST_T + 6, '#8a3fb0', 88);
+          spawnArrow(arrows, cx + dx, CLEFT_T + 3, cx + dx, POST_T + 6, ION_COLORS.glu, 88);
         }
         for (const dx of NMDA_DX) {
           spawnDir(particles, 'glu', cx + dx, CLEFT_T + 4, cx + dx, POST_T + 8, 6);
-          spawnArrow(arrows, cx + dx, CLEFT_T + 3, cx + dx, POST_T + 6, '#8a3fb0', 88);
+          spawnArrow(arrows, cx + dx, CLEFT_T + 3, cx + dx, POST_T + 6, ION_COLORS.glu, 88);
         }
       }
       break;
@@ -125,7 +125,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
         const cx = COLS[ci].cx;
         for (const dx of AMPA_DX) {
           spawnDir(particles, 'na', cx + dx, POST_T + 5, cx + dx, POST_T + 120, 16);
-          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 110, '#4fa8e8', 92);
+          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 110, ION_COLORS.na, 92);
         }
       }
       break;
@@ -136,7 +136,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
         const cx = COLS[ci].cx;
         for (const dx of NMDA_DX) {
           spawnDir(particles, 'ca2', cx + dx, POST_T + 5, cx + dx, POST_T + 130, 18);
-          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 120, '#e07050', 98);
+          spawnArrow(arrows, cx + dx, POST_T + 6, cx + dx, POST_T + 120, ION_COLORS.ca, 98);
         }
       }
       break;
@@ -149,7 +149,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
           const kx = cx + (ki === 0 ? -38 : 38);
           const ky = CAMKII_DY[ki];
           for (const dx of NMDA_DX) {
-            spawnArrow(arrows, cx + dx, POST_T + 120, kx, ky, '#e07050', 98);
+            spawnArrow(arrows, cx + dx, POST_T + 120, kx, ky, ION_COLORS.ca, 98);
           }
         }
       }
