@@ -14,7 +14,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-       PAGE 1 — Overview (two neurons)
+       PAGE 1; Overview (two neurons)
   ══════════════════════════════════════════ -->
   <div class="page active" id="page-intro">
     <h1 class="anim">Glutamatergic Synapse</h1>
@@ -27,36 +27,36 @@
     <div class="def-card anim">
       <h2>What is a glutamatergic synapse?</h2>
       <p>
-        A <span class="hl">synapse</span> is the junction where two neurons communicate.
-        In a <span class="hl">glutamatergic synapse</span>, the neurotransmitter is
-        <span class="hl">glutamate</span> — the brain's primary excitatory signal at ~90% of CNS synapses.
+        <span class="hl">Synapses</span> are the primary way information is transmitted across neurons.
+        In <span class="hl">glutamatergic synapses</span>, the neurotransmitter is
+        <span class="hl">glutamate</span>: the main excitatory signal for ~90% of brain synapses.
       </p>
       <p>
-        The <span class="hl">presynaptic terminal</span> (tip of the axon) packages glutamate into
-        vesicles. An <span class="hl">action potential</span> triggers Ca²⁺ influx, causing vesicle
-        fusion and glutamate release into the <span class="hl">synaptic cleft</span>.
+        The <span class="hl">presynaptic axon terminal</span> stores glutamate in vesicles. An
+        <span class="hl">action potential</span> triggers Ca²⁺ to enter, which causes vesicles to
+        fuse and release glutamate into the <span class="hl">synaptic cleft</span>.
       </p>
       <p>
-        Glutamate binds <span class="hl">AMPA</span> and <span class="hl">NMDA receptors</span>
-        on the postsynaptic dendritic spine, generating excitation and driving
-        <span class="hl">long-term potentiation (LTP)</span>.
+        Glutamate then binds <span class="hl">AMPA</span> and <span class="hl">NMDA receptors</span>
+        onto the postsynaptic dendritic spine, exciting the cell and triggering
+        <span class="hl">long-term potentiation (LTP)</span> which is the basis of learning and memory.
       </p>
     </div>
 
     <div class="anim">
-      <button class="btn-primary" onclick="goSynapse()">🔬 Zoom into the synapse →</button>
+      <button class="btn-primary" onclick="goSynapse()">Zoom into the synapse</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
-       PAGE 2 — Interactive Synapse Diagram
+       PAGE 2; Interactive Synapse Diagram
   ══════════════════════════════════════════ -->
   <div class="page" id="page-synapse">
 
     <!-- Top bar: back button + title -->
     <div class="topbar">
       <button class="back-btn" onclick="goIntro()">← Overview</button>
-      <h1>Glutamatergic Synapse — Interactive Diagram</h1>
+      <h1>Glutamatergic Synapse - Interactive Diagram</h1>
       <div style="width:82px"></div>
     </div>
 
@@ -99,7 +99,7 @@
 
         <!-- Hover/click info card -->
         <div class="pcard info-card" id="info-box">
-          <span class="placeholder">Hover over any part, then click to read about it.</span>
+          <span class="placeholder">Hover over any part, then click to read the description.</span>
         </div>
 
         <!-- Step-by-step process list -->
@@ -107,35 +107,35 @@
           <div class="steps-hdr">Process Steps</div>
           <div class="step-row" id="sr0">
             <div class="snum">1</div>
-            <div class="stxt"><strong>Action potential</strong> travels down the axon to the presynaptic terminal</div>
+            <div class="stxt"><strong>Action potential</strong> travels to the terminal</div>
           </div>
           <div class="step-row" id="sr1">
             <div class="snum">2</div>
-            <div class="stxt"><strong>VGCCs open</strong> — Ca²⁺ channels in terminal membrane open</div>
+            <div class="stxt"><strong>Ca²⁺ channels open</strong>; Ca²⁺ enters</div>
           </div>
           <div class="step-row" id="sr2">
             <div class="snum">3</div>
-            <div class="stxt"><strong>Ca²⁺ floods in</strong> — triggers SNARE proteins on docked vesicles</div>
+            <div class="stxt"><strong>Ca²⁺ triggers</strong> vesicle fusion</div>
           </div>
           <div class="step-row" id="sr3">
             <div class="snum">4</div>
-            <div class="stxt"><strong>Vesicle fusion</strong> — releases ~3,000 glutamate molecules into cleft</div>
+            <div class="stxt"><strong>Vesicle fuses</strong>; ~3,000 glutamate molecules released</div>
           </div>
           <div class="step-row" id="sr4">
             <div class="snum">5</div>
-            <div class="stxt"><strong>Glutamate diffuses</strong> across the ~20 nm synaptic cleft</div>
+            <div class="stxt"><strong>Glutamate crosses</strong> the cleft</div>
           </div>
           <div class="step-row" id="sr5">
             <div class="snum">6</div>
-            <div class="stxt"><strong>AMPA receptors open</strong> — Na⁺ flows in → fast EPSC</div>
+            <div class="stxt"><strong>AMPA opens</strong>; Na⁺ flows in (fast signal)</div>
           </div>
           <div class="step-row" id="sr6">
             <div class="snum">7</div>
-            <div class="stxt"><strong>NMDA unblocks</strong> — Mg²⁺ ejected; Ca²⁺ enters postsynaptic cell</div>
+            <div class="stxt"><strong>NMDA unblocks</strong>; Ca²⁺ enters (plasticity)</div>
           </div>
           <div class="step-row" id="sr7">
             <div class="snum">8</div>
-            <div class="stxt"><strong>CaMKII activates</strong> — Ca²⁺ via NMDA → LTP</div>
+            <div class="stxt"><strong>CaMKII strengthens</strong> the synapse (LTP)</div>
           </div>
         </div>
 
