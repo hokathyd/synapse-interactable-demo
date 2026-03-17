@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glutamatergic Synapse</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ── Zoom transition overlay ── -->
+  <div id="zoom-overlay">
+    <div class="zoom-txt">Zooming into the synaptic junction…</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PAGE 1 — Overview (two neurons)
+  ══════════════════════════════════════════ -->
+  <div class="page active" id="page-intro">
+    <h1 class="anim">Glutamatergic Synapse</h1>
+    <div class="subtitle anim">The brain's primary excitatory communication system</div>
+
+    <!-- Overview canvas: animated two-neuron diagram -->
+    <canvas id="neuron-canvas" width="900" height="330" class="anim"></canvas>
+
+    <!-- Definition card -->
+    <div class="def-card anim">
+      <h2>What is a glutamatergic synapse?</h2>
+      <p>
+        A <span class="hl">synapse</span> is the junction where two neurons communicate.
+        In a <span class="hl">glutamatergic synapse</span>, the neurotransmitter is
+        <span class="hl">glutamate</span> — the brain's primary excitatory signal at ~90% of CNS synapses.
+      </p>
+      <p>
+        The <span class="hl">presynaptic terminal</span> (tip of the axon) packages glutamate into
+        vesicles. An <span class="hl">action potential</span> triggers Ca²⁺ influx, causing vesicle
+        fusion and glutamate release into the <span class="hl">synaptic cleft</span>.
+      </p>
+      <p>
+        Glutamate binds <span class="hl">AMPA</span> and <span class="hl">NMDA receptors</span>
+        on the postsynaptic dendritic spine, generating excitation and driving
+        <span class="hl">long-term potentiation (LTP)</span>.
+      </p>
+    </div>
+
+    <div class="anim">
+      <button class="btn-primary" onclick="goSynapse()">🔬 Zoom into the synapse →</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       PAGE 2 — Interactive Synapse Diagram
+  ══════════════════════════════════════════ -->
+  <div class="page" id="page-synapse">
+
+    <!-- Top bar: back button + title -->
+    <div class="topbar">
+      <button class="back-btn" onclick="goIntro()">← Overview</button>
+      <h1>Glutamatergic Synapse — Interactive Diagram</h1>
+      <div style="width:82px"></div>
+    </div>
+
+    <div class="synapse-layout">
+
+      <!-- Left: canvas + legend + step popup -->
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+        <canvas id="syn-canvas" width="840" height="680"></canvas>
+
+        <!-- Legend (below canvas, under presynaptic area) -->
+        <div class="pcard legend-below">
+          <div class="leg-hdr">Legend</div>
+          <div class="leg-section">Ions</div>
+          <div class="leg-row"><div class="ldot" style="background:#3a9fc8"></div>Ca²⁺</div>
+          <div class="leg-row"><div class="ldot" style="background:#4fa8e8"></div>Na⁺</div>
+          <div class="leg-row"><div class="ldot" style="background:#64b464"></div>K⁺</div>
+          <div class="leg-row"><div class="ldot" style="background:#a0a0af"></div>Mg²⁺</div>
+          <div class="leg-row"><div class="ldot" style="background:#8a3fb0;border:2px solid #6a1f90"></div>Glutamate</div>
+          <div class="leg-section">Structures</div>
+          <div class="leg-row"><div class="ldot" style="background:#8a3fb0;border:2px solid #6a1f90"></div>Synaptic vesicle</div>
+          <div class="leg-row"><div class="ldot" style="background:#3a9fc8"></div>Ca²⁺ entering terminal</div>
+          <div class="leg-row"><div class="ldot" style="background:#4fa8e8"></div>Na⁺ through AMPA</div>
+          <div class="leg-row"><div class="ldot" style="background:#e07050"></div>Ca²⁺ through NMDA</div>
+          <div class="leg-row"><div class="lrect" style="background:#6890d0"></div>AMPA receptor</div>
+          <div class="leg-row"><div class="lrect" style="background:#9060c0"></div>NMDA receptor</div>
+          <div class="leg-row"><div class="lrect" style="background:#e0c030;border-radius:50%;width:9px;height:9px"></div>CaMKII</div>
+        </div>
+
+        <!-- Step detail popup (shown below canvas when a phase is active) -->
+        <div id="step-popup">
+          <button class="pop-close" onclick="closePopup()">✕</button>
+          <div class="pop-tag" id="pop-tag">Step</div>
+          <h4 id="pop-title"></h4>
+          <p id="pop-body"></p>
+        </div>
+      </div>
+
+      <!-- Right panel: info + controls + legend -->
+      <div class="panel">
+
+        <!-- Hover/click info card -->
+        <div class="pcard info-card" id="info-box">
+          <span class="placeholder">Hover over any part, then click to read about it.</span>
+        </div>
+
+        <!-- Step-by-step process list -->
+        <div class="pcard">
+          <div class="steps-hdr">Process Steps</div>
+          <div class="step-row" id="sr0">
+            <div class="snum">1</div>
+            <div class="stxt"><strong>Action potential</strong> travels down the axon to the presynaptic terminal</div>
+          </div>
+          <div class="step-row" id="sr1">
+            <div class="snum">2</div>
+            <div class="stxt"><strong>VGCCs open</strong> — Ca²⁺ channels in terminal membrane open</div>
+          </div>
+          <div class="step-row" id="sr2">
+            <div class="snum">3</div>
+            <div class="stxt"><strong>Ca²⁺ floods in</strong> — triggers SNARE proteins on docked vesicles</div>
+          </div>
+          <div class="step-row" id="sr3">
+            <div class="snum">4</div>
+            <div class="stxt"><strong>Vesicle fusion</strong> — releases ~3,000 glutamate molecules into cleft</div>
+          </div>
+          <div class="step-row" id="sr4">
+            <div class="snum">5</div>
+            <div class="stxt"><strong>Glutamate diffuses</strong> across the ~20 nm synaptic cleft</div>
+          </div>
+          <div class="step-row" id="sr5">
+            <div class="snum">6</div>
+            <div class="stxt"><strong>AMPA receptors open</strong> — Na⁺ flows in → fast EPSC</div>
+          </div>
+          <div class="step-row" id="sr6">
+            <div class="snum">7</div>
+            <div class="stxt"><strong>NMDA unblocks</strong> — Mg²⁺ ejected; Ca²⁺ enters postsynaptic cell</div>
+          </div>
+          <div class="step-row" id="sr7">
+            <div class="snum">8</div>
+            <div class="stxt"><strong>CaMKII activates</strong> — Ca²⁺ via NMDA → LTP</div>
+          </div>
+        </div>
+
+        <!-- Playback controls -->
+        <div class="pcard">
+          <div class="ctrl-row">
+            <button class="btn-fire" id="btn-fire">⚡ Fire AP</button>
+            <button class="btn-next" id="btn-next" disabled>Next →</button>
+          </div>
+          <div class="auto-row">
+            <input type="checkbox" id="cb-auto">
+            <label for="cb-auto">Autoplay steps</label>
+          </div>
+          <div class="speed-row">
+            <span>Speed</span>
+            <input type="range" id="speed-slider" min="0.25" max="3" step="0.25" value="1">
+            <span class="speed-val" id="speed-val">1×</span>
+          </div>
+          <button class="btn-replay" id="btn-replay" style="display:none">↺ Replay this step</button>
+          <button class="btn-reset"  id="btn-reset">↺ Reset all</button>
+        </div>
+
+      </div><!-- /.panel -->
+    </div><!-- /.synapse-layout -->
+  </div><!-- /#page-synapse -->
+
+  <!-- Scripts loaded in dependency order -->
+  <script src="js/navigation.js"></script>
+  <script src="js/overview.js"></script>
+  <script src="js/synapse-data.js"></script>
+  <script src="js/synapse-draw.js"></script>
+  <script src="js/synapse-particles.js"></script>
+  <script src="js/synapse-ui.js"></script>
+
+</body>
+</html>

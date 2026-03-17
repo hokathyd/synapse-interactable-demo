@@ -1,0 +1,389 @@
+/* ═══════════════════════════════════════════════════
+   styles.css — Glutamatergic Synapse Visualiser
+   Covers: base reset, typography, page layout,
+   intro page, synapse page, panel UI components
+═══════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap');
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ── */
+body {
+  background: #f0ecf8;
+  font-family: 'Nunito Sans', sans-serif;
+  color: #3a2d5e;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Page system: only .active page is shown ── */
+.page {
+  display: none;
+  width: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+}
+.page.active { display: flex; }
+
+/* ── Fade-up entrance animation ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.anim { animation: fadeUp .6s ease both; }
+
+/* ── Zoom transition overlay ── */
+#zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: #12062a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .45s;
+}
+#zoom-overlay.show { opacity: 1; pointer-events: all; }
+.zoom-txt {
+  color: #c0a0e8;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity .4s .35s;
+}
+#zoom-overlay.show .zoom-txt { opacity: 1; }
+
+
+/* ══════════════════════════════════════════
+   INTRO PAGE
+══════════════════════════════════════════ */
+
+#page-intro {
+  padding: 30px 20px 22px;
+  gap: 0;
+}
+
+#page-intro h1 {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: #3a2d5e;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  font-size: .9rem;
+  color: #7a5aaa;
+  font-style: italic;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+/* Overview canvas */
+#neuron-canvas {
+  border-radius: 14px;
+  box-shadow: 0 4px 28px rgba(90,60,140,.22);
+  background: #0e0520;
+  display: block;
+  margin-bottom: 20px;
+}
+
+/* Definition card below canvas */
+.def-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px 26px;
+  max-width: 660px;
+  width: 100%;
+  box-shadow: 0 4px 24px rgba(90,60,140,.11);
+  margin-bottom: 22px;
+}
+.def-card h2 {
+  font-family: 'Nunito', sans-serif;
+  font-size: .78rem;
+  font-weight: 800;
+  color: #7a4aaa;
+  margin-bottom: 9px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.def-card p {
+  font-size: .84rem;
+  line-height: 1.7;
+  color: #4a3a6a;
+  margin-bottom: 8px;
+}
+.def-card p:last-child { margin-bottom: 0; }
+
+/* Inline highlight spans */
+.hl { color: #7a4aaa; font-weight: 700; }
+
+
+/* ══════════════════════════════════════════
+   SHARED BUTTON BASE
+══════════════════════════════════════════ */
+
+button {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  transition: all .18s;
+}
+button:active { transform: scale(.95); }
+
+.btn-primary {
+  background: #7a4aaa;
+  color: #fff;
+  padding: 12px 36px;
+  font-size: .95rem;
+  box-shadow: 0 4px 18px rgba(122,74,170,.42);
+}
+.btn-primary:hover { background: #8a5aba; }
+
+
+/* ══════════════════════════════════════════
+   SYNAPSE PAGE LAYOUT
+══════════════════════════════════════════ */
+
+#page-synapse { padding: 10px 14px; gap: 0; }
+
+.topbar {
+  width: 100%;
+  max-width: 1180px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.topbar h1 {
+  font-family: 'Nunito', sans-serif;
+  font-size: .98rem;
+  font-weight: 800;
+  color: #3a2d5e;
+}
+
+.back-btn {
+  background: #fff;
+  color: #7a4aaa;
+  border: 2px solid #c8b8e8;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: .72rem;
+}
+.back-btn:hover { background: #f0ecf8; border-color: #9b6dcc; }
+
+/* Two-column flex: canvas left, panel right */
+.synapse-layout {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 1180px;
+  align-items: flex-start;
+}
+
+#syn-canvas {
+  border-radius: 16px;
+  box-shadow: 0 4px 28px rgba(90,60,140,.14);
+  background: #faf8ff;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+
+/* ══════════════════════════════════════════
+   RIGHT PANEL CARDS
+══════════════════════════════════════════ */
+
+.panel {
+  width: 282px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Generic card shell */
+.pcard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 11px 13px;
+  box-shadow: 0 2px 12px rgba(90,60,140,.09);
+}
+
+/* Info / hover card */
+.info-card {
+  border: 2.5px solid transparent;
+  transition: border-color .25s;
+  min-height: 84px;
+}
+.info-card.lit { border-color: #9b6dcc; }
+.placeholder {
+  font-size: .7rem;
+  color: #bbaad0;
+  font-style: italic;
+  line-height: 1.5;
+}
+.itag {
+  display: inline-block;
+  background: #ede8f5;
+  color: #7a5aaa;
+  font-size: .54rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.info-card h3 {
+  font-family: 'Nunito', sans-serif;
+  font-size: .82rem;
+  font-weight: 700;
+  color: #3a2d5e;
+  margin-bottom: 4px;
+}
+.info-card p { font-size: .67rem; color: #5a4a7a; line-height: 1.52; }
+
+/* Step list */
+.steps-hdr {
+  font-family: 'Nunito', sans-serif;
+  font-size: .68rem;
+  font-weight: 800;
+  color: #3a2d5e;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.step-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 5px;
+  align-items: flex-start;
+  opacity: .26;
+  transition: opacity .35s, transform .3s;
+}
+.step-row.active { opacity: 1; transform: translateX(3px); }
+.step-row.done   { opacity: .52; }
+.snum {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #e8e0f5; color: #7a4aaa;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: .57rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+  transition: background .3s, color .3s;
+}
+.step-row.active .snum { background: #7a4aaa; color: #fff; }
+.step-row.done   .snum { background: #8ec878; color: #1a4010; }
+.stxt { font-size: .64rem; color: #4a3a6a; line-height: 1.4; }
+.stxt strong { color: #5a3a9a; font-weight: 700; }
+
+/* Playback controls */
+.ctrl-row { display: flex; gap: 5px; margin-bottom: 5px; }
+
+.btn-fire {
+  flex: 1; background: #7a4aaa; color: #fff;
+  padding: 8px; font-size: .74rem;
+  box-shadow: 0 3px 10px rgba(122,74,170,.38);
+}
+.btn-fire:hover    { background: #8a5aba; }
+.btn-fire:disabled { background: #c0a8e0; box-shadow: none; cursor: not-allowed; transform: none; }
+
+.btn-next {
+  background: #3a9a60; color: #fff;
+  padding: 8px 11px; font-size: .74rem;
+  box-shadow: 0 2px 8px rgba(50,140,80,.32);
+}
+.btn-next:hover    { background: #2a8a50; }
+.btn-next:disabled { background: #a8d0b0; box-shadow: none; cursor: not-allowed; transform: none; }
+
+.btn-replay {
+  width: 100%; background: #e09030; color: #fff;
+  padding: 7px; font-size: .71rem;
+  box-shadow: 0 2px 8px rgba(200,130,30,.3);
+  margin-bottom: 5px;
+}
+.btn-replay:hover { background: #c87820; }
+
+.btn-reset {
+  width: 100%; background: #f0ecf8; color: #7a4aaa;
+  padding: 7px; font-size: .71rem;
+  border: 2px solid #d0c0e8;
+}
+.btn-reset:hover { background: #e8e0f8; border-color: #9b6dcc; }
+
+.auto-row {
+  display: flex; align-items: center;
+  gap: 6px; font-size: .67rem; color: #7a5aaa; margin-bottom: 4px;
+}
+.auto-row input { accent-color: #7a4aaa; width: 12px; height: 12px; cursor: pointer; }
+
+.speed-row { display: flex; align-items: center; gap: 6px; font-size: .65rem; color: #7a5aaa; }
+.speed-row input[type=range] { flex: 1; accent-color: #7a4aaa; cursor: pointer; }
+.speed-val { font-weight: 700; color: #7a4aaa; min-width: 22px; text-align: right; }
+
+/* Legend */
+.leg-hdr {
+  font-family: 'Nunito', sans-serif;
+  font-size: .68rem; font-weight: 700;
+  color: #3a2d5e; margin-bottom: 5px;
+}
+.leg-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; font-size: .65rem; color: #5a4a7a; }
+.leg-section { font-size: .6rem; font-weight: 700; color: #7a5aaa; text-transform: uppercase; letter-spacing: .06em; margin-top: 6px; margin-bottom: 3px; }
+.leg-section:first-of-type { margin-top: 0; }
+.ldot  { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.lrect { width: 13px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.legend-below { max-width: 840px; }
+
+/* Step detail popup (below canvas) */
+#step-popup {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(90,60,140,.2);
+  border: 2px solid #c0a0e0;
+  padding: 12px 16px;
+  display: none;
+  margin-top: 8px;
+  width: 100%;
+  max-width: 840px;
+  position: relative;
+}
+#step-popup.show { display: block; }
+.pop-tag {
+  display: inline-block;
+  background: #ede8f5; color: #7a5aaa;
+  font-size: .54rem;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; padding: 2px 6px;
+  border-radius: 6px; margin-bottom: 4px;
+  text-transform: uppercase; letter-spacing: .07em;
+}
+#step-popup h4 {
+  font-family: 'Nunito', sans-serif;
+  font-size: .81rem; font-weight: 700;
+  color: #3a2d5e; margin-bottom: 3px;
+}
+#step-popup p { font-size: .68rem; color: #5a4a7a; line-height: 1.53; }
+.pop-close {
+  position: absolute; top: 6px; right: 8px;
+  background: none; color: #aaa;
+  font-size: .75rem; padding: 2px 5px; cursor: pointer;
+}
+.pop-close:hover { color: #555; }
