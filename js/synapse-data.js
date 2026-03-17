@@ -150,51 +150,51 @@ const PARTS = {
 // ── Step popup descriptions ───────────────────────────────────
 const STEP_POPUPS = [
   {
-    tag:   'Step 1; Docked',
-    title: 'Vesicles Docked & Primed (SNARE Complex)',
+    tag:   'Step 0; Docked',
+    title: 'Vesicles Already Docked/Primed by SNARE Before Action Potential Arrives',
     body:  'Vesicles are already docked and primed at the presynaptic membrane before an action ' +
            'potential arrives. SNARE proteins (v-SNARE on vesicle, t-SNARE on membrane) mediate ' +
            'docking and priming, preparing vesicles to fuse quickly when Ca²⁺ rises.',
   },
   {
-    tag:   'Step 2; AP',
+    tag:   'Step 1; AP',
     title: 'Action Potential Arrives',
     body:  'The electrical signal travels down the axon and reaches the terminal. The depolarization ' +
            'of the presynaptic terminal triggers the next step.',
   },
   {
-    tag:   'Step 3; VGCCs',
+    tag:   'Step 2; VGCCs',
     title: 'Voltage-Gated Ca²⁺ Channels Open',
     body:  'The voltage change opens voltage-gated Ca²⁺ channels (VGCCs). Ca²⁺ floods in due to ' +
            'the depolarization—there is much more Ca²⁺ outside than inside.',
   },
   {
-    tag:   'Step 4; Fusion',
+    tag:   'Step 3; Fusion',
     title: 'Ca²⁺ Triggers Fusion; Glutamate Released',
     body:  'Ca²⁺ binds synaptotagmin, which triggers the SNARE complex to pull vesicle and membrane ' +
            'together → vesicle fusion. Glutamate is released into the cleft.',
   },
   {
-    tag:   'Step 5; Binding',
+    tag:   'Step 4; Binding',
     title: 'Glutamate Crosses Cleft; Binds to AMPA',
     body:  'Glutamate diffuses across the narrow cleft (10–20 nm) in under half a millisecond. ' +
            'It binds to AMPA receptors on the postsynaptic membrane and stays there—' +
            'it does not pass through the cell.',
   },
   {
-    tag:   'Step 6; AMPA',
+    tag:   'Step 5; AMPA',
     title: 'AMPA Receptors Open; Na⁺ Flows In',
     body:  'Glutamate unbinds (disappears) as AMPA receptors open. Na⁺ flows in, depolarizing the ' +
            'cell within 1–2 ms. This is the fast excitatory signal (EPSP).',
   },
   {
-    tag:   'Step 7; NMDA',
+    tag:   'Step 6; NMDA',
     title: 'NMDA Unblocks; Ca²⁺ Enters',
     body:  'NMDA receptors are blocked by Mg²⁺ at rest. The depolarization from AMPA pushes ' +
            'Mg²⁺ out, so Ca²⁺ (and Na⁺) can now flow in. This Ca²⁺ signal drives plasticity.',
   },
   {
-    tag:   'Step 8; LTP',
+    tag:   'Step 7; LTP',
     title: 'CaMKII Strengthens the Synapse',
     body:  'Ca²⁺ from NMDA activates CaMKII. CaMKII adds more AMPA receptors to the membrane and ' +
            'makes them more responsive. The synapse is potentiated long-term; this is LTP.',
