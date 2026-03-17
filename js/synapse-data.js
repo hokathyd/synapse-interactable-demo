@@ -39,8 +39,6 @@ const VGCC_ANGLES = [Math.PI * .35, Math.PI * .65];
 const VGCC_DX = [Math.round(TERM_R * Math.cos(VGCC_ANGLES[0])), Math.round(TERM_R * Math.cos(VGCC_ANGLES[1]))];
 const VGCC_DY = Math.round(TERM_R * Math.sin(VGCC_ANGLES[0]));
 
-// Fusion site x-offsets: left of VGCC, between VGCCs, right of VGCC
-const FUSE_DX = [-45, 0, 45];
 
 // NMDA receptor x-offset; centred between the two AMPA receptors
 const NMDA_DX = [0];       // center of spine
@@ -208,6 +206,13 @@ const STEP_POPUPS = [
 const VPOS_REL = [
   [-72,  TERM_R * .04], [  0,  TERM_R * .04], [ 72,  TERM_R * .04],  // top row; docked
   [-36,  TERM_R * .20], [ 36,  TERM_R * .20],                        // between each, slightly down
+];
+
+// Fusion targets: left/right 2x out and up on arc; center stays
+const FUSE_TARGETS = [
+  { dx: -90, dy: -18 },   // left: 2x left, up
+  { dx:   0, dy:  -8 },   // center
+  { dx:  90, dy: -18 },   // right: 2x right, up
 ];
 
 /**

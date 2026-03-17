@@ -172,14 +172,15 @@ function drawVesicles(ctx, VESICLES) {
   for (const v of VESICLES) {
     if (v.released) continue;  // hidden when merged (step 4)
 
-    // Fusing animation: vesicle moves toward its fusion site (left, between, or right of VGCCs)
+    // Fusing animation: vesicle moves toward fusion site (L/R 2x out and up; center stays)
     if (v.fusing) {
       v.fuseProgress = Math.min(1, (v.fuseProgress || 0) + 0.02);
       const fp  = v.fuseProgress;
       const cx  = COLS[v.col].cx;
-      const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);  // left, center, right
-      const tx = cx + FUSE_DX[fuseIdx];
-      const ty = PRE_BOT - 8;  // fusion site on presynaptic membrane
+      const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
+      const t   = FUSE_TARGETS[fuseIdx];
+      const tx  = cx + t.dx;
+      const ty  = PRE_BOT + t.dy;
       v.cx = v.origCx + (tx - v.origCx) * fp;
       v.cy = v.origCy + (ty - v.origCy) * fp;
       if (fp >= 1) { v.fusing = false; v.stuckAtMembrane = true; }  // fused at membrane; released in step 4

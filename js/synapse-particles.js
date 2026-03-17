@@ -81,7 +81,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 3: Ca²⁺ continues perpendicular into terminal toward vesicles ──
+    // ── Step 3: Ca²⁺ continues perpendicular into terminal toward vesicles (particles only, no arrows) ──
     case 'ca_in':
       for (const v of VESICLES) {
         if (!v.docked) continue;
@@ -96,10 +96,9 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
           const ang = VGCC_ANGLES[vi];
           const vx = cx + Math.cos(ang) * TERM_R;
           const vy = PRE_TOP + Math.sin(ang) * TERM_R;
-          const caFromX = vx - Math.cos(ang) * 35;  // Ca²⁺ that just entered (perpendicular)
+          const caFromX = vx - Math.cos(ang) * 35;
           const caFromY = vy - Math.sin(ang) * 35;
           spawnDir(particles, 'ca', caFromX, caFromY, cx, vesTargetY, 8);
-          spawnArrow(arrows, caFromX, caFromY, cx, vesTargetY, ION_COLORS.ca, 85);
         }
       }
       break;
@@ -112,11 +111,12 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       // Glutamate from 3 points: left of VGCC, between VGCCs, right of VGCC
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
-        const fuseY = PRE_BOT + 5;
         for (let fi = 0; fi < 3; fi++) {
-          const fx = cx + FUSE_DX[fi];
-          spawnDir(particles, 'glu', fx, fuseY, fx, CLEFT_T + CLEFT_H * .5, 6);
-          spawnArrow(arrows, fx, fuseY, fx, CLEFT_T + CLEFT_H * .5, ION_COLORS.glu, 105);
+          const t = FUSE_TARGETS[fi];
+          const fx = cx + t.dx;
+          const fy = PRE_BOT + t.dy;
+          spawnDir(particles, 'glu', fx, fy, fx, CLEFT_T + CLEFT_H * .5, 6);
+          spawnArrow(arrows, fx, fy, fx, CLEFT_T + CLEFT_H * .5, ION_COLORS.glu, 105);
         }
       }
       break;
