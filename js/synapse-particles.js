@@ -61,7 +61,11 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 2: VGCCs open; Ca²⁺ enters perpendicular to each VGCC semicircle ──
+    // ── Step 2: SNARE lines appear only (no vesicle movement) ──
+    case 'snare':
+      break;
+
+    // ── Step 3: VGCCs open; Ca²⁺ enters (only Ca²⁺ movement) ──
     case 'vgcc':
       for (let ci = 0; ci < 2; ci++) {
         const cx = COLS[ci].cx;
@@ -81,7 +85,7 @@ function phaseParticles(phase, particles, arrows, VESICLES) {
       }
       break;
 
-    // ── Step 3: Ca²⁺ continues perpendicular into terminal toward vesicles (particles only, no arrows) ──
+    // ── Step 4: Ca²⁺ triggers fusion of docked vesicles ──
     case 'ca_in':
       for (const v of VESICLES) {
         if (!v.docked) continue;

@@ -113,6 +113,7 @@ function drawPresynaptic(ctx, phase, VESICLES) {
   ctx.fillText('PRESYNAPTIC', 8, 36);
 
   drawVGCCs(ctx, phase);
+  drawSnareTethers(ctx, VESICLES, phase);
   drawVesicles(ctx, VESICLES);
 }
 
@@ -165,14 +166,57 @@ function drawVGCCs(ctx, phase) {
 }
 
 /**
+ * Draw SNARE tether lines between docked vesicles and the membrane.
+ * Only shown from step 2 (snare) onward until fusion starts.
+ */
+function drawSnareTethers(ctx, VESICLES, phase) {
+  const SNARE_COL = 'rgba(140,160,180,.55)';
+  const SNARE_WIDTH = 1.5;
+
+  // SNARE lines appear in step 2 (snare) and stay through step 3 (vgcc) until fusion
+  const showSnare = ['snare', 'vgcc'].includes(phase);
+
+  for (const v of VESICLES) {
+    if (!showSnare || !v.docked || v.fusing || v.stuckAtMembrane || v.released) continue;
+
+    const cx = COLS[v.col].cx;
+    const fuseIdx = v.origCx < cx - 15 ? 0 : (v.origCx > cx + 15 ? 2 : 1);
+    const t = FUSE_TARGETS[fuseIdx];
+    const mx = cx + t.dx;
+    const my = PRE_BOT + t.dy;
+
+    // Tether from vesicle bottom to membrane fusion site
+    const vx = v.cx;
+    const vy = v.cy + v.r;
+
+    ctx.beginPath();
+    ctx.moveTo(vx, vy);
+    ctx.lineTo(mx, my);
+    ctx.strokeStyle = SNARE_COL;
+    ctx.lineWidth = SNARE_WIDTH;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Small bridge shape at membrane contact (SNARE complex)
+    ctx.beginPath();
+    ctx.arc(mx, my, 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(160,180,200,.5)';
+    ctx.strokeStyle = 'rgba(140,160,180,.7)';
+    ctx.lineWidth = 1;
+    ctx.fill();
+    ctx.stroke();
+  }
+}
+
+/**
  * Draw synaptic vesicles.
- * Docked vesicles animate toward the membrane during the fusion phase.
+ * Vesicles start docked; step 4: fuse (move down to membrane).
  */
 function drawVesicles(ctx, VESICLES) {
   for (const v of VESICLES) {
-    if (v.released) continue;  // hidden when merged (step 4)
+    if (v.released) continue;  // hidden when merged
 
-    // Fusing animation: vesicle moves toward fusion site (L/R 2x out and up; center stays)
+    // Fusing animation (step 4): vesicle moves down to fusion site
     if (v.fusing) {
       v.fuseProgress = Math.min(1, (v.fuseProgress || 0) + 0.02);
       const fp  = v.fuseProgress;
@@ -183,7 +227,7 @@ function drawVesicles(ctx, VESICLES) {
       const ty  = PRE_BOT + t.dy;
       v.cx = v.origCx + (tx - v.origCx) * fp;
       v.cy = v.origCy + (ty - v.origCy) * fp;
-      if (fp >= 1) { v.fusing = false; v.stuckAtMembrane = true; }  // fused at membrane; released in step 4
+      if (fp >= 1) { v.fusing = false; v.stuckAtMembrane = true; }
     }
 
     const isH = hov === 'vesicle' && hovId === v.id;

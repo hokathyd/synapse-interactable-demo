@@ -27,11 +27,11 @@ function initSynapse() {
   const ctx    = canvas.getContext('2d');
 
   // ── Phase order ──────────────────────────────────
-  const PHASES = ['rest','ap','vgcc','ca_in','fusion','release','ampa_open','nmda_open','camkii'];
+  const PHASES = ['rest','ap','snare','vgcc','ca_in','fusion','release','ampa_open','nmda_open','camkii'];
 
   // How many ticks each phase lasts before auto-advancing (at 1× speed)
   const PHASE_DURATIONS = {
-    ap: 85, vgcc: 95, ca_in: 100, fusion: 110,
+    ap: 85, snare: 90, vgcc: 95, ca_in: 100, fusion: 110,
     release: 105, ampa_open: 120, nmda_open: 130,
     camkii: 99999, // stays until manually advanced
   };
@@ -93,7 +93,6 @@ function initSynapse() {
       v.cy = v.origCy;
     }
     particles.length = 0;
-    // For fusion phase, need vesicles to be "fusing" so release can run
     if (prevPhase === 'fusion') {
       for (const v of VESICLES) {
         if (v.docked) v.fusing = true;

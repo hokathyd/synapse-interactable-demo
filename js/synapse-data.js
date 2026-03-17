@@ -156,44 +156,50 @@ const STEP_POPUPS = [
            'change is the trigger for everything that follows.',
   },
   {
-    tag:   'Step 2; VGCCs',
+    tag:   'Step 2; SNARE',
+    title: 'SNARE Proteins at Active Zone',
+    body:  'SNARE proteins (synaptobrevin, syntaxin, SNAP-25) hold vesicles docked at the membrane. ' +
+           'Vesicles are primed—but do not fuse until Ca²⁺ arrives.',
+  },
+  {
+    tag:   'Step 3; VGCCs',
     title: 'Ca²⁺ Channels Open',
     body:  'The voltage change opens voltage-gated Ca²⁺ channels (VGCCs). Ca²⁺ flows in from the ' +
-           'cleft, following the same path as the action potential (yellow line).',
+           'cleft into the terminal.',
   },
   {
-    tag:   'Step 3; Ca²⁺',
-    title: 'Ca²⁺ Reaches Vesicles; Vesicles Fuse with Membrane',
-    body:  'Ca²⁺ binds to proteins on docked vesicles at the active zone. The vesicles move ' +
-           'toward and fuse with the presynaptic membrane (between the VGCCs), not the channel itself.',
+    tag:   'Step 4; Ca²⁺',
+    title: 'Ca²⁺ Triggers Fusion',
+    body:  'Ca²⁺ binds to synaptotagmin on the already-docked vesicles. This triggers the final ' +
+           'SNARE-mediated fusion step: the vesicle merges with the membrane and opens to release glutamate.',
   },
   {
-    tag:   'Step 4; Fusion',
+    tag:   'Step 5; Fusion',
     title: 'Vesicle Merges; Glutamate Released',
     body:  'The vesicle merges with the membrane (and disappears). Glutamate is released from ' +
            'the fusion site—the membrane opening—not from the VGCC. The VGCC only triggered the fusion.',
   },
   {
-    tag:   'Step 5; Binding',
+    tag:   'Step 6; Binding',
     title: 'Glutamate Crosses Cleft; Binds to AMPA',
     body:  'Glutamate diffuses across the narrow cleft (10–20 nm) in under half a millisecond. ' +
            'It binds to AMPA receptors on the postsynaptic membrane and stays there—' +
            'it does not pass through the cell.',
   },
   {
-    tag:   'Step 6; AMPA',
+    tag:   'Step 7; AMPA',
     title: 'Glutamate Triggers AMPA; Na⁺ Flows In',
     body:  'Glutamate unbinds (disappears) as AMPA receptors open. Na⁺ flows in, depolarizing the ' +
            'cell within 1–2 ms. This is the fast excitatory signal (EPSP).',
   },
   {
-    tag:   'Step 7; NMDA',
+    tag:   'Step 8; NMDA',
     title: 'NMDA Unblocks; Ca²⁺ Enters',
     body:  'NMDA receptors are blocked by Mg²⁺ at rest. The depolarization from AMPA pushes ' +
            'Mg²⁺ out, so Ca²⁺ (and Na⁺) can now flow in. This Ca²⁺ signal drives plasticity.',
   },
   {
-    tag:   'Step 8; LTP',
+    tag:   'Step 9; LTP',
     title: 'CaMKII Strengthens the Synapse',
     body:  'Ca²⁺ from NMDA activates CaMKII. CaMKII adds more AMPA receptors to the membrane and ' +
            'makes them more responsive. The synapse is potentiated long-term; this is LTP.',
@@ -217,8 +223,7 @@ const FUSE_TARGETS = [
 
 /**
  * Build the vesicle array for both columns.
- * Each vesicle tracks its animated position, original position,
- * fusion state, and which column it belongs to.
+ * First 3 per column: start docked at active zone; step 2 shows SNARE lines; step 4 fuses (moves down).
  */
 function buildVesicles() {
   const vesicles = [];
@@ -230,16 +235,16 @@ function buildVesicles() {
       vesicles.push({
         id:          col * VPOS_REL.length + i,
         col,
-        cx:          ox,   // current (animated) x
-        cy:          oy,   // current (animated) y
-        origCx:      ox,   // reset target
+        cx:          ox,
+        cy:          oy,
+        origCx:      ox,
         origCy:      oy,
-        r:           12,   // all same size
-        docked:      i < 3,  // first 3 per column docked and fuse (left, center, right)
+        r:           12,
+        docked:      i < 3,
         released:    false,
         fusing:      false,
-        stuckAtMembrane: false,  // step 3: vesicle fused at membrane; step 4: released/disappears
-        fuseProgress: 0,   // 0..1 animation progress
+        stuckAtMembrane: false,
+        fuseProgress: 0,
       });
     }
   }

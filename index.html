@@ -74,6 +74,7 @@
         <div class="leg-row"><div class="ldot" style="background:#FF0000"></div>Glutamate</div>
         <div class="leg-section">Structures</div>
         <div class="leg-row"><div class="ldot" style="background:#FF8C00"></div>VGCC (Ca²⁺ channel)</div>
+        <div class="leg-row"><div class="ldot" style="background:#8ca0b4"></div>SNARE (docking)</div>
         <div class="leg-row"><div class="ldot" style="background:#FF0000"></div>Synaptic vesicle</div>
         <div class="leg-row"><div class="ldot" style="background:#69f0ae"></div>AMPA receptor</div>
         <div class="leg-row"><div class="ldot" style="background:#26a69a"></div>NMDA receptor</div>
@@ -111,30 +112,34 @@
           </div>
           <div class="step-row" id="sr1">
             <div class="snum">2</div>
-            <div class="stxt"><strong>Ca²⁺ channels open</strong>; Ca²⁺ enters</div>
+            <div class="stxt"><strong>SNARE proteins</strong> dock vesicles</div>
           </div>
           <div class="step-row" id="sr2">
             <div class="snum">3</div>
-            <div class="stxt"><strong>Ca²⁺ triggers</strong> vesicle fusion</div>
+            <div class="stxt"><strong>Ca²⁺ channels open</strong>; Ca²⁺ enters</div>
           </div>
           <div class="step-row" id="sr3">
             <div class="snum">4</div>
-            <div class="stxt"><strong>Vesicle fuses</strong>; ~3,000 glutamate molecules released</div>
+            <div class="stxt"><strong>Ca²⁺ triggers</strong> vesicle fusion</div>
           </div>
           <div class="step-row" id="sr4">
             <div class="snum">5</div>
-            <div class="stxt"><strong>Glutamate crosses</strong> the cleft</div>
+            <div class="stxt"><strong>Vesicle fuses</strong>; ~3,000 glutamate molecules released</div>
           </div>
           <div class="step-row" id="sr5">
             <div class="snum">6</div>
-            <div class="stxt"><strong>AMPA opens</strong>; Na⁺ flows in (fast signal)</div>
+            <div class="stxt"><strong>Glutamate crosses</strong> the cleft</div>
           </div>
           <div class="step-row" id="sr6">
             <div class="snum">7</div>
-            <div class="stxt"><strong>NMDA unblocks</strong>; Ca²⁺ enters (plasticity)</div>
+            <div class="stxt"><strong>AMPA opens</strong>; Na⁺ flows in (fast signal)</div>
           </div>
           <div class="step-row" id="sr7">
             <div class="snum">8</div>
+            <div class="stxt"><strong>NMDA unblocks</strong>; Ca²⁺ enters (plasticity)</div>
+          </div>
+          <div class="step-row" id="sr8">
+            <div class="snum">9</div>
             <div class="stxt"><strong>CaMKII strengthens</strong> the synapse (LTP)</div>
           </div>
         </div>
@@ -143,7 +148,7 @@
         <div class="pcard">
           <div class="ctrl-row">
             <button class="btn-back-step" id="btn-back" disabled>← Back</button>
-            <button class="btn-fire" id="btn-fire">⚡ Fire AP</button>
+            <button class="btn-fire" id="btn-fire">Fire AP</button>
             <button class="btn-next" id="btn-next" disabled>Next →</button>
           </div>
           <div class="auto-row">
@@ -155,8 +160,8 @@
             <input type="range" id="speed-slider" min="0.25" max="3" step="0.25" value="1">
             <span class="speed-val" id="speed-val">1×</span>
           </div>
-          <button class="btn-replay" id="btn-replay" style="display:none">↺ Replay this step</button>
-          <button class="btn-reset"  id="btn-reset">↺ Reset all</button>
+          <button class="btn-replay" id="btn-replay" style="display:none">Replay this step</button>
+          <button class="btn-reset"  id="btn-reset">Reset all</button>
         </div>
 
       </div><!-- /.panel -->
